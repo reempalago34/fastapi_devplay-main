@@ -46,3 +46,99 @@ class ProfileUpdateRequest(BaseModel):
     language: str | None = Field(default=None, pattern=r"^(es|en)$")
 
     model_config = ConfigDict(populate_by_name=True)
+
+
+# ------------------ Registro con código de 6 dígitos -----------------------
+
+
+class RegisterResponse(BaseModel):
+    """Registro ya NO crea sesión: manda un código de confirmación por correo."""
+
+    ok: bool = True
+    id: str
+    username: str
+    sent_to: str = Field(alias="sentTo")
+    demo_code: str | None = Field(default=None, alias="demoCode")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class VerifyRegisterRequest(BaseModel):
+    """{ email, code } verifica · { email, resend: true } reenvía."""
+
+    email: EmailStr
+    code: str | None = Field(default=None, pattern=r"^\d{6}$")
+    resend: bool = False
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class VerifyRegisterResponse(BaseModel):
+    ok: bool = True
+    username: str | None = None
+    sent_to: str | None = Field(default=None, alias="sentTo")
+    demo_code: str | None = Field(default=None, alias="demoCode")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+# ---------------------- Recuperación de contraseña ------------------------
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ForgotPasswordResponse(BaseModel):
+    ok: bool = True
+    message: str
+    sent_to: str | None = Field(default=None, alias="sentTo")
+    demo_code: str | None = Field(default=None, alias="demoCode")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class ResetPasswordRequest(BaseModel):
+    """Camino nuevo {email, code, password} o legacy {token, password}."""
+
+    email: EmailStr | None = None
+    code: str | None = Field(default=None, pattern=r"^\d{6}$")
+    password: str = Field(min_length=6, max_length=100)
+    token: str | None = Field(default=None, min_length=10, max_length=255)
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class OkMessageResponse(BaseModel):
+    ok: bool = True
+    message: str
+
+
+# -------------------------------- Invitados --------------------------------
+
+
+class GuestRequest(BaseModel):
+    username: str | None = Field(default=None, max_length=20)
+
+
+class GuestResponse(BaseModel):
+    id: str
+    username: str
+    is_guest: bool = Field(alias="isGuest")
+    # Extra respecto a devplay-main: la API es stateless (JWT) y los invitados
+    # no pueden usar /auth/login, así que se les entrega la sesión aquí.
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+# ------------------------------ Realtime ----------------------------------
+
+
+class RealtimeTokenResponse(BaseModel):
+    token: str
+    expires_in: int = Field(alias="expiresIn")
+
+    model_config = ConfigDict(populate_by_name=True)

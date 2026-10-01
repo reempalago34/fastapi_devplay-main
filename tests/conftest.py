@@ -34,6 +34,16 @@ def database():
     Base.metadata.drop_all(engine)
 
 
+@pytest.fixture(autouse=True)
+def _clean_rate_limits():
+    """El rate limit vive en memoria compartida entre tests: se limpia en cada uno."""
+    from app.utils.rate_limit import _hits
+
+    _hits.clear()
+    yield
+    _hits.clear()
+
+
 @pytest.fixture()
 def db(database):
     """Sesión de SQLAlchemy dedicada para sembrar datos desde los tests."""

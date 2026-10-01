@@ -42,3 +42,7 @@ target-version = "py311"
 select = ["E", "F", "I", "UP", "B"]
 # B008: `Depends(...)` en argumentos es el patrón estándar de FastAPI
 ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+# Las plantillas HTML de correo son bloques largos a propósito
+"app/utils/mailer.py" = ["E501"]

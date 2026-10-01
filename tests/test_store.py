@@ -42,21 +42,23 @@ def test_items_catalog_is_public_and_grouped(client, db):
     assert res.status_code == 200, res.text
     body = res.json()
 
-    # orden: categoría asc, precio asc
-    assert [i["category"] for i in body["items"]] == [
-        "avatar",
-        "powerup",
-        "powerup",
-        "premium",
+    # orden: categoría asc, precio asc (el catálogo puede tener más artículos
+    # de otros tests, así que comparamos solo los de este)
+    nombres = {"Turbo", "Boost", "Marco", "Pro"}
+    propios = [i for i in body["items"] if i["name"] in nombres]
+    assert [(i["category"], i["name"]) for i in propios] == [
+        ("avatar", "Marco"),
+        ("powerup", "Turbo"),
+        ("powerup", "Boost"),
+        ("premium", "Pro"),
     ]
-    powerups = body["grouped"]["powerup"]
-    assert [p["name"] for p in powerups] == ["Turbo", "Boost"]
 
     # las 4 categorías base siempre presentes, aunque vacías
-    assert set(body["grouped"]) == {"powerup", "avatar", "premium", "bundle"}
+    assert set(body["grouped"]) >= {"powerup", "avatar", "premium", "bundle"}
     assert body["grouped"]["bundle"] == []
-    assert body["items"][0]["imageUrl"] is None
-    assert body["items"][0]["createdAt"]
+    marco = next(i for i in propios if i["name"] == "Marco")
+    assert marco["imageUrl"] is None
+    assert marco["createdAt"]
 
 
 def test_items_grouped_is_consistent(client, db):

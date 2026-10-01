@@ -21,13 +21,15 @@ def test_register_login_and_me(client):
         "age": 25,
     }
     res = client.post(f"{BASE}/auth/register", json=payload)
-    assert res.status_code == 201, res.text
+    assert res.status_code == 200, res.text
     body = res.json()
-    assert body["user"]["username"] == "erick_dev"
-    assert body["user"]["dev_coins"] == 100
-    assert "access_token" in body
+    # El registro NO crea sesión: manda un código de 6 dígitos al correo
+    assert body["ok"] is True
+    assert body["username"] == "erick_dev"
+    assert body["sentTo"] == "er***@test.com"
+    assert len(body["demoCode"]) == 6  # sin SMTP → modo demo
 
-    # login
+    # login (requiere contraseña correcta; el código confirma el correo)
     res = client.post(
         f"{BASE}/auth/login",
         json={"email": "erick@test.com", "password": "secret123"},
@@ -59,9 +61,11 @@ def test_register_rejects_duplicate_email(client):
         "fullName": "Dup User",
         "age": 30,
     }
-    assert client.post(f"{BASE}/auth/register", json=payload).status_code == 201
+    assert client.post(f"{BASE}/auth/register", json=payload).status_code == 200
     payload["username"] = "otro_username"
-    assert client.post(f"{BASE}/auth/register", json=payload).status_code == 409
+    res = client.post(f"{BASE}/auth/register", json=payload)
+    assert res.status_code == 409
+    assert res.json()["detail"] == "El email o usuario ya existe"
 
 
 def test_register_validates_minors_and_username_format(client):
@@ -112,7 +116,11 @@ def test_update_profile(client):
         "fullName": "Profile User",
         "age": 22,
     }
-    tokens = client.post(f"{BASE}/auth/register", json=payload).json()
+    client.post(f"{BASE}/auth/register", json=payload)
+    tokens = client.post(
+        f"{BASE}/auth/login",
+        json={"email": payload["email"], "password": payload["password"]},
+    ).json()
     headers = {"Authorization": f"Bearer {tokens['access_token']}"}
 
     res = client.patch(
