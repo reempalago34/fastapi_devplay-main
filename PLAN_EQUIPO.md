@@ -39,8 +39,9 @@ A partir de aquí cada dominio avanza por separado.
 | M2 | `Follow` | `follow` (GET/POST/DELETE), `users/[id]`, `users/[id]/followers`, `users/[id]/following`, `users/by-username/[username]`, `users/me/stats`, `users/me/achievements`, `users/me/bookmarks` |
 | M3 | `StoreItem`, `StorePurchase`, `DevCoinTransaction` | `store/items`, `store/buy`, `store/balance`, `store/my-items` |
 
-Además: termina el flujo de registro con código de 6 dígitos (`LoginCode` +
-SMTP), `forgot-password` / `reset-password`, `auth/guest` y `realtime-token`.
+Además — **Erick ✅ Hecho**: registro con código de 6 dígitos (`LoginCode` +
+SMTP o modo demo con `demoCode`), `verify-register`, `forgot-password` /
+`reset-password`, `auth/guest` y `realtime-token` (HMAC, 30 min).
 
 ### Compañero — Contenido, juegos y directos
 
