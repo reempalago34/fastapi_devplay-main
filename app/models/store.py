@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import ForeignKey, Index, Integer, String, Text
+from sqlalchemy import ForeignKey, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, CreatedAtMixin, id_pk
@@ -25,7 +25,10 @@ class StoreItem(Base, CreatedAtMixin):
 
 class StorePurchase(Base, CreatedAtMixin):
     __tablename__ = "StorePurchase"
-    __table_args__ = (Index("ix_StorePurchase_userId", "userId"),)
+    __table_args__ = (
+        UniqueConstraint("userId", "itemId", name="StorePurchase_userId_itemId_key"),
+        Index("ix_StorePurchase_userId", "userId"),
+    )
 
     id: Mapped[str] = id_pk()
     user_id: Mapped[str] = mapped_column(
