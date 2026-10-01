@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from jwt import InvalidTokenError
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -60,8 +61,11 @@ def login(payload: LoginRequest, request: Request, db: Session = Depends(get_db)
 
     user = authenticate(db, payload.email, payload.password)
     if user is None:
+        # Se asocia al usuario si el email existe (el fallo puede ser la clave)
+        known = db.scalar(select(User).where(User.email == payload.email.lower()))
         db.add(
             LoginEvent(
+                user_id=known.id if known else None,
                 email=payload.email.lower(),
                 success=False,
                 ip=ip,
