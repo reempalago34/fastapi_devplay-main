@@ -115,7 +115,7 @@ main          ← siempre funciona: pytest en verde + uvicorn arranca
 |---|---|---|---|
 | **M0** | Base: estructura, 22 modelos, JWT, health, auth, tests | Erick | ✅ Hecho |
 | **M1** | Seguridad/moderación **‖** Feed (posts/likes/comentarios) | Erick ‖ Compañero | Erick ✅ / Compañero ⬜ |
-| **M2** | Users/follow/stats **‖** Betas/polls/streams | Erick ‖ Compañero | ⬜ |
+| **M2** | Users/follow/stats **‖** Betas/polls/streams | Erick ‖ Compañero | Erick ✅ / Compañero ⬜ |
 | **M3** | Tienda DevCoins **‖** Chat/DM/notificaciones | Erick ‖ Compañero | ⬜ |
 | **M4** | discover/search/buddy + integración con Next.js y realtime | Juntos | ⬜ |
 
