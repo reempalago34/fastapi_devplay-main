@@ -6,7 +6,7 @@ import pytest
 from sqlalchemy import text
 
 from app.core.database import engine
-from app.utils.rate_limit import _hits
+from tests.factories import auth, make_user
 
 BASE = "/api/v1"
 
@@ -18,6 +18,8 @@ def _clean_state(database):
     La fixture `database` de conftest.py es de sesión (crea las tablas una vez),
     así que sin esto los usuarios de un test chocarían con los del siguiente.
     """
+    from app.utils.rate_limit import _hits
+
     _hits.clear()
     with engine.begin() as conn:
         conn.execute(
@@ -35,36 +37,29 @@ def _unique(prefix: str) -> str:
     return f"{prefix}_{uuid.uuid4().hex[:8]}"
 
 
-def register(client, username: str | None = None) -> dict:
-    """Registra un usuario con datos únicos y devuelve sus headers."""
+def register(db, username: str | None = None) -> dict:
+    """Crea un usuario en BD y devuelve sus headers.
+
+    Usa la fábrica compartida del equipo en vez de POST /auth/register: el registro
+    ahora exige un código de 6 dígitos y consumiría el rate limit (5/min por IP).
+    """
     name = username or _unique("user")
-    res = client.post(
-        f"{BASE}/auth/register",
-        json={
-            "email": f"{name}@test.com",
-            "username": name,
-            "password": "secret123",
-            "fullName": name.title(),
-            "age": 25,
-        },
-    )
-    assert res.status_code == 201, res.text
-    body = res.json()
+    user = make_user(db, email=f"{name}@test.com", username=name)
     return {
-        "Authorization": f"Bearer {body['access_token']}",
-        "user_id": body["user"]["id"],
-        "username": body["user"]["username"],
+        "Authorization": auth(user)["Authorization"],
+        "user_id": user.id,
+        "username": user.username,
     }
 
 
 @pytest.fixture()
-def author(client):
-    return register(client, "author_user")
+def author(db):
+    return register(db, "author_user")
 
 
 @pytest.fixture()
-def reader(client):
-    return register(client, "reader_user")
+def reader(db):
+    return register(db, "reader_user")
 
 
 def make_post(client, headers, content="Hola mundo", media=None) -> dict:
@@ -274,7 +269,7 @@ def test_toggle_bookmark(client, author, reader):
 # --- Repost ---
 
 
-def test_repost_once_per_user(client, author, reader):
+def test_repost_once_per_user(client, db, author, reader):
     post = make_post(client, author, "contenido original")
 
     res = client.post(f"{BASE}/posts/{post['id']}/repost", headers=reader)
@@ -287,7 +282,7 @@ def test_repost_once_per_user(client, author, reader):
     assert client.post(f"{BASE}/posts/{post['id']}/repost", headers=reader).status_code == 409
 
     # otro usuario sí puede repostear
-    other = register(client, "third_user")
+    other = register(db, "third_user")
     assert client.post(f"{BASE}/posts/{post['id']}/repost", headers=other).status_code == 201
 
     # los reposts no aparecen en el feed general

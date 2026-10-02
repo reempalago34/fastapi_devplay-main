@@ -7,7 +7,7 @@ import pytest
 from sqlalchemy import text
 
 from app.core.database import engine
-from app.utils.rate_limit import _hits
+from tests.factories import auth, make_user
 
 BASE = "/api/v1"
 
@@ -15,6 +15,8 @@ BASE = "/api/v1"
 @pytest.fixture(autouse=True)
 def _clean_state(database):
     """Aísla cada test: vacía tablas y rate limit (mismo patrón que test_posts)."""
+    from app.utils.rate_limit import _hits
+
     _hits.clear()
     with engine.begin() as conn:
         conn.execute(
@@ -28,31 +30,21 @@ def _clean_state(database):
     _hits.clear()
 
 
-def register(client, username: str | None = None) -> dict:
+def register(db, username: str | None = None) -> dict:
+    """Crea el usuario con la fábrica compartida (evita el código de verificación)."""
     name = username or f"user_{uuid.uuid4().hex[:8]}"
-    res = client.post(
-        f"{BASE}/auth/register",
-        json={
-            "email": f"{name}@test.com",
-            "username": name,
-            "password": "secret123",
-            "fullName": name.title(),
-            "age": 25,
-        },
-    )
-    assert res.status_code == 201, res.text
-    body = res.json()
-    return {"Authorization": f"Bearer {body['access_token']}", "user_id": body["user"]["id"]}
+    user = make_user(db, email=f"{name}@test.com", username=name)
+    return {"Authorization": auth(user)["Authorization"], "user_id": user.id}
 
 
 @pytest.fixture()
-def author(client):
-    return register(client, "poll_author")
+def author(db):
+    return register(db, "poll_author")
 
 
 @pytest.fixture()
-def voter(client):
-    return register(client, "poll_voter")
+def voter(db):
+    return register(db, "poll_voter")
 
 
 def make_post(client, headers, content="post con encuesta") -> str:
@@ -303,8 +295,8 @@ def test_vote_rejects_foreign_option(client, author, voter):
     assert res.status_code == 422
 
 
-def test_vote_counts_accumulate(client, voter):
-    users = [register(client) for _ in range(3)]
+def test_vote_counts_accumulate(client, db, voter):
+    users = [register(db) for _ in range(3)]
     post_id = make_post(client, users[0])
     poll = make_poll(client, post_id, users[0]).json()
     zelda = poll["options"][0]["id"]

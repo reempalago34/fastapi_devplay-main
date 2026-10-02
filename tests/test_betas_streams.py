@@ -6,7 +6,7 @@ import pytest
 from sqlalchemy import text
 
 from app.core.database import engine
-from app.utils.rate_limit import _hits
+from tests.factories import auth, make_user
 
 BASE = "/api/v1"
 
@@ -14,6 +14,8 @@ BASE = "/api/v1"
 @pytest.fixture(autouse=True)
 def _clean_state(database):
     """Aísla cada test: vacía tablas y rate limit (mismo patrón que los otros dominios)."""
+    from app.utils.rate_limit import _hits
+
     _hits.clear()
     with engine.begin() as conn:
         conn.execute(
@@ -28,31 +30,21 @@ def _clean_state(database):
     _hits.clear()
 
 
-def register(client, username: str | None = None) -> dict:
+def register(db, username: str | None = None) -> dict:
+    """Crea el usuario con la fábrica compartida (evita el código de verificación)."""
     name = username or f"user_{uuid.uuid4().hex[:8]}"
-    res = client.post(
-        f"{BASE}/auth/register",
-        json={
-            "email": f"{name}@test.com",
-            "username": name,
-            "password": "secret123",
-            "fullName": name.title()[:30],
-            "age": 25,
-        },
-    )
-    assert res.status_code == 201, res.text
-    body = res.json()
-    return {"Authorization": f"Bearer {body['access_token']}", "user_id": body["user"]["id"]}
+    user = make_user(db, email=f"{name}@test.com", username=name)
+    return {"Authorization": auth(user)["Authorization"], "user_id": user.id}
 
 
 @pytest.fixture()
-def author(client):
-    return register(client, "beta_author")
+def author(db):
+    return register(db, "beta_author")
 
 
 @pytest.fixture()
-def other(client):
-    return register(client, "beta_other")
+def other(db):
+    return register(db, "beta_other")
 
 
 def make_beta(client, headers, **overrides) -> dict:
