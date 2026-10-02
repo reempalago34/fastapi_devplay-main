@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.api.v1 import (
     auth,
     betas,
+    chat,
     follow,
     health,
     polls,
@@ -24,7 +25,8 @@ api_router.include_router(follow.router)
 api_router.include_router(store.router)
 api_router.include_router(realtime.router)
 
-# --- Frank: contenido, encuestas, betas y directos ---
+# --- Frank: contenido, encuestas, betas, directos, chat y notificaciones ---
 api_router.include_router(posts.router)
 api_router.include_router(polls.router)
 api_router.include_router(betas.router)
+api_router.include_router(chat.router)
