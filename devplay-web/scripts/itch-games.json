@@ -1,0 +1,438 @@
+{
+  "scrapedAt": "2026-09-08T22:14:21.740Z",
+  "games": [
+    {
+      "url": "https://ipodtouch0218.itch.io/nsmb-mariovsluigi",
+      "title": "NSMB - Mario Vs Luigi Online",
+      "author": "ipodtouch0218",
+      "authorUrl": "https://ipodtouch0218.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzIxOTk5MjgyLmdpZg==/original/MVNGek.gif",
+      "platforms": [
+        "Web",
+        "PC",
+        "Mac"
+      ],
+      "genreES": "Plataformas",
+      "description": null
+    },
+    {
+      "url": "https://gektorne.itch.io/httpsxcomgektorne",
+      "title": "Gizmoduck (fangame)",
+      "author": "Gektorne",
+      "authorUrl": "https://gektorne.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzE0NTYwNTI4LmdpZg==/315x250%23c/3pjBwA.gif",
+      "platforms": [
+        "PC",
+        "Mac"
+      ],
+      "genreES": "Plataformas",
+      "description": null
+    },
+    {
+      "url": "https://marytheproducer.itch.io/mushroom-kids-big-grass-sword",
+      "title": "Mushroom Kid's Big Grass Sword",
+      "author": "MaryTheProducer",
+      "authorUrl": "https://marytheproducer.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzE0NTYwNTI4LmdpZg==/original/cjDkXn.gif",
+      "platforms": [
+        "PC"
+      ],
+      "genreES": "Plataformas",
+      "description": "Play as a mushroom kid on a journey to save their village with a sword that grows!"
+    },
+    {
+      "url": "https://mrsuicidesheep.itch.io/sheepy",
+      "title": "Sheepy: A Short Adventure",
+      "author": "MrSuicideSheep",
+      "authorUrl": "https://mrsuicidesheep.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzE0ODcxMjc2LmpwZw==/original/a4mjvh.jpg",
+      "platforms": [
+        "PC"
+      ],
+      "genreES": "Plataformas",
+      "description": "Help Sheepy, as he explores a forgotten and broken world."
+    },
+    {
+      "url": "https://sylvie.itch.io/gmtk",
+      "title": "Grapplehook Midpoint Teleport Killer",
+      "author": "sylvie",
+      "authorUrl": "https://sylvie.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI5ODE2OTYzLnBuZw==/original/yA5kqk.png",
+      "platforms": [
+        "PC",
+        "Mac"
+      ],
+      "genreES": "Plataformas",
+      "description": "Get Me That Kitten!"
+    },
+    {
+      "url": "https://j3nnn.itch.io/prisoners",
+      "title": "Prisoners",
+      "author": "JJ (J3NNN)",
+      "authorUrl": "https://j3nnn.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI4MTc5MzMyLmdpZg==/original/gO8Rs%2B.gif",
+      "platforms": [
+        "Web",
+        "PC",
+        "Mac"
+      ],
+      "genreES": "RPG",
+      "description": "Can you trust a stranger who is in love with you?"
+    },
+    {
+      "url": "https://racheldrawsthis.itch.io/dead-plate",
+      "title": "Dead Plate",
+      "author": "racheldrawsthis",
+      "authorUrl": "https://racheldrawsthis.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzEzOTExNTU0LnBuZw==/original/OqHi78.png",
+      "platforms": [
+        "PC",
+        "Mac"
+      ],
+      "genreES": "RPG",
+      "description": "60s French restaurant tycoon themed rpg horror game about a waiter and a chef"
+    },
+    {
+      "url": "https://rosesrot.itch.io/killer-chat",
+      "title": "Killer Chat! Original Edition",
+      "author": "rosesrot",
+      "authorUrl": "https://rosesrot.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzE4MDAyMzYzLnBuZw==/original/t%2FS%2BWm.png",
+      "platforms": [
+        "PC",
+        "Mac"
+      ],
+      "genreES": "RPG",
+      "description": "You're a writer that's been (mistakenly) invited to a serial killer server. Uh oh."
+    },
+    {
+      "url": "https://racheldrawsthis.itch.io/cold-front",
+      "title": "Cold Front",
+      "author": "racheldrawsthis",
+      "authorUrl": "https://racheldrawsthis.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI5Njk3NTU1LnBuZw==/315x250%23c/%2BxoIhY.png",
+      "platforms": [
+        "PC",
+        "Mac"
+      ],
+      "genreES": "RPG",
+      "description": null
+    },
+    {
+      "url": "https://spicaze.itch.io/silver-thread",
+      "title": "Silver Thread : Episode I",
+      "author": "Spica",
+      "authorUrl": "https://spicaze.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzE2NzE3MDc4LnBuZw==/315x250%23c/itNyZG.png",
+      "platforms": [
+        "Web",
+        "PC"
+      ],
+      "genreES": "RPG",
+      "description": null
+    },
+    {
+      "url": "https://scaredstupidinc.itch.io/midnight-special",
+      "title": "Midnight Special",
+      "author": "ScaredStupidInc",
+      "authorUrl": "https://scaredstupidinc.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzM0NjMwNjMucG5n/315x250%23c/obcSPz.png",
+      "platforms": [
+        "PC"
+      ],
+      "genreES": "Puzzle",
+      "description": null
+    },
+    {
+      "url": "https://teambeanloop.itch.io/six-cats-under",
+      "title": "Six Cats Under",
+      "author": "Team Bean Loop",
+      "authorUrl": "https://teambeanloop.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzM0NjMwNjMucG5n/original/y4bpPK.png",
+      "platforms": [
+        "Web",
+        "PC",
+        "Mac"
+      ],
+      "genreES": "Puzzle",
+      "description": "You died. Your unfinished business? The fate of your many cats!"
+    },
+    {
+      "url": "https://objetdiscret.itch.io/tai-fab-museum",
+      "title": "Taiyaki Fabulous Museum of Fish",
+      "author": "objetdiscret",
+      "authorUrl": "https://objetdiscret.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI5NDY0MzkzLnBuZw==/315x250%23c/lz4iq0.png",
+      "platforms": [
+        "Web"
+      ],
+      "genreES": "Puzzle",
+      "description": null
+    },
+    {
+      "url": "https://inbluegames.itch.io/the-grand-book-archive-tidy-up",
+      "title": "The Grand Book Archive: Tidy Up",
+      "author": "Inblue Games",
+      "authorUrl": "https://inbluegames.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI5NDY0MzkzLnBuZw==/original/nvzfS1.png",
+      "platforms": [
+        "Web",
+        "PC"
+      ],
+      "genreES": "Puzzle",
+      "description": "A book sorting incremental game"
+    },
+    {
+      "url": "https://qwook.itch.io/last-seen-online",
+      "title": "last seen online",
+      "author": "qwook",
+      "authorUrl": "https://qwook.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzE0NDM1NDk3LnBuZw==/original/gRPrhC.png",
+      "platforms": [
+        "Web"
+      ],
+      "genreES": "Puzzle",
+      "description": "Look through a stranger's computer. A horror puzzle game."
+    },
+    {
+      "url": "https://polypaw.itch.io/the-no-jumpscare-show",
+      "title": "The No Jumpscare Show",
+      "author": "Polypaw",
+      "authorUrl": "https://polypaw.itch.io",
+      "cover": null,
+      "platforms": [
+        "PC"
+      ],
+      "genreES": "Aventura",
+      "description": null
+    },
+    {
+      "url": "https://unfall-games.itch.io/the-delivery-guy",
+      "title": "The Delivery Guy",
+      "author": "Unfall Games",
+      "authorUrl": "https://unfall-games.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI5MDI2MDIwLmdpZg==/original/E0lirg.gif",
+      "platforms": [
+        "PC"
+      ],
+      "genreES": "Aventura",
+      "description": "It should’ve been a normal delivery…"
+    },
+    {
+      "url": "https://a1esska.itch.io/771-demo",
+      "title": "771 DEMO",
+      "author": "a1esska",
+      "authorUrl": "https://a1esska.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI5NTkwMTYyLnBuZw==/original/QTs2Sa.png",
+      "platforms": [
+        "PC"
+      ],
+      "genreES": "Aventura",
+      "description": "A psychological horror game in the walking simulator genre."
+    },
+    {
+      "url": "https://joetheitchpro.itch.io/get-upstairs",
+      "title": "GET UPSTAIRS",
+      "author": "JoeTheItchPro",
+      "authorUrl": "https://joetheitchpro.itch.io",
+      "cover": null,
+      "platforms": [
+        "PC",
+        "Mac"
+      ],
+      "genreES": "Aventura",
+      "description": null
+    },
+    {
+      "url": "https://leonncamayo.itch.io/failrooms",
+      "title": "FailRooms",
+      "author": "LeonnCamayo",
+      "authorUrl": "https://leonncamayo.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI5Nzc0NzkyLmdpZg==/original/SfLagE.gif",
+      "platforms": [
+        "PC"
+      ],
+      "genreES": "Aventura",
+      "description": "Failrooms: A realistic comedy about the terrible interior design of the Backrooms."
+    },
+    {
+      "url": "https://mors-games.itch.io/dead-center",
+      "title": "dead_center",
+      "author": "mors",
+      "authorUrl": "https://mors-games.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzIxNTM1OTYwLnBuZw==/315x250%23c/rqh4uU.png",
+      "platforms": [
+        "Web",
+        "PC",
+        "Mac"
+      ],
+      "genreES": "Shooter",
+      "description": null
+    },
+    {
+      "url": "https://verrial.itch.io/projectaether",
+      "title": "Project Aether",
+      "author": "Verrial",
+      "authorUrl": "https://verrial.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzIxNTM1OTYwLnBuZw==/original/tyY0L8.png",
+      "platforms": [
+        "PC"
+      ],
+      "genreES": "Shooter",
+      "description": "Every Weapon. Every Map. One game."
+    },
+    {
+      "url": "https://hakita.itch.io/ultrakill-prelude",
+      "title": "ULTRAKILL Prelude",
+      "author": "Hakita",
+      "authorUrl": "https://hakita.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzEyMTkxNTgyLnBuZw==/315x250%23c/DAf0%2F%2F.png",
+      "platforms": [
+        "PC"
+      ],
+      "genreES": "Shooter",
+      "description": null
+    },
+    {
+      "url": "https://orsonik.itch.io/gunsaw-demo",
+      "title": "Gunsaw Demo",
+      "author": "Orsoniks",
+      "authorUrl": "https://orsonik.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzQ1NjEwNDYuZ2lm/315x250%23c/iQ3Pdg.gif",
+      "platforms": [
+        "PC"
+      ],
+      "genreES": "Shooter",
+      "description": null
+    },
+    {
+      "url": "https://stepford.itch.io/gun-knight",
+      "title": "Gun Knight",
+      "author": "Stepford",
+      "authorUrl": "https://stepford.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzQ1NjEwNDYuZ2lm/original/I702Q5.gif",
+      "platforms": [
+        "Web",
+        "PC"
+      ],
+      "genreES": "Shooter",
+      "description": "A knight who modifies his gun by changing its attachments."
+    },
+    {
+      "url": "https://doppie.itch.io/narinig-mo-ba",
+      "title": "Narinig Mo Ba?",
+      "author": "doppie",
+      "authorUrl": "https://doppie.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI4NTMyNzYzLnBuZw==/original/NnyHH%2F.png",
+      "platforms": [
+        "Web",
+        "PC"
+      ],
+      "genreES": "Terror",
+      "description": "\"Huy, Mare! Narinig mo ba?\""
+    },
+    {
+      "url": "https://kyle-horwood.itch.io/climb",
+      "title": "CLIMB",
+      "author": "Kyle Horwood",
+      "authorUrl": "https://kyle-horwood.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI4MjUwMDcxLnBuZw==/315x250%23c/A1dMqf.png",
+      "platforms": [
+        "PC"
+      ],
+      "genreES": "Terror",
+      "description": null
+    },
+    {
+      "url": "https://meg-umi.itch.io/geisha",
+      "title": "Geisha",
+      "author": "Meg_.umi",
+      "authorUrl": "https://meg-umi.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI4MjUwMDcxLnBuZw==/original/hApRJ7.png",
+      "platforms": [
+        "PC",
+        "Mac"
+      ],
+      "genreES": "Terror",
+      "description": "He seems like more than just a regular client"
+    },
+    {
+      "url": "https://hopefullight.itch.io/time-traveler",
+      "title": "Death Loop [A Danganronpa-inspired Game]",
+      "author": "Hopeful Light",
+      "authorUrl": "https://hopefullight.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI1MDAwODEyLnBuZw==/original/91jYOt.png",
+      "platforms": [
+        "Web",
+        "PC"
+      ],
+      "genreES": "Terror",
+      "description": "Inspired by Danganronpa and other death games"
+    },
+    {
+      "url": "https://jazzainab.itch.io/divine-possession",
+      "title": "Divine Possession - Season One",
+      "author": "jazzainab",
+      "authorUrl": "https://jazzainab.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI5ODA1MjU1LnBuZw==/original/pReo2y.png",
+      "platforms": [
+        "PC",
+        "Mac"
+      ],
+      "genreES": "Terror",
+      "description": null
+    },
+    {
+      "url": "https://whitescarstudio.itch.io/to",
+      "title": "Twilight Observer",
+      "author": "WhiteScar Studios",
+      "authorUrl": "https://whitescarstudio.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI5MjQ3NDU0LmpwZWc=/315x250%23c/u0UjaR.jpeg",
+      "platforms": [
+        "Web",
+        "PC"
+      ],
+      "genreES": "Otro",
+      "description": null
+    },
+    {
+      "url": "https://nincy12.itch.io/feed-the-fish",
+      "title": "FEED THE FISH",
+      "author": "Nincy",
+      "authorUrl": "https://nincy12.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI5NzYyMzYzLnBuZw==/315x250%23c/ymz8aG.png",
+      "platforms": [
+        "PC"
+      ],
+      "genreES": "Otro",
+      "description": null
+    },
+    {
+      "url": "https://merius94.itch.io/still-with-me-demo",
+      "title": "Still With Me [Demo]",
+      "author": "merius94",
+      "authorUrl": "https://merius94.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzI5MTkxNzAzLmpwZw==/original/dQnpo2.jpg",
+      "platforms": [
+        "PC"
+      ],
+      "genreES": "Otro",
+      "description": "Atmospheric Psychological Horror"
+    },
+    {
+      "url": "https://garula.itch.io/the-freak-circus",
+      "title": "The Freak Circus",
+      "author": "Garula",
+      "authorUrl": "https://garula.itch.io",
+      "cover": "https://img.itch.zone/aW1nLzIxNjQxODI1LnBuZw==/original/sIu4WS.png",
+      "platforms": [
+        "Web",
+        "PC",
+        "Mac",
+        "Android"
+      ],
+      "genreES": "Otro",
+      "description": "18+ Yandere"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "imap-test",
+  "private": true,
+  "dependencies": {
+    "imapflow": "^2.0.0"
+  }
+}

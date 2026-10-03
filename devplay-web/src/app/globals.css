@@ -1,0 +1,775 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-bitter);
+  --font-display: var(--font-fraunces);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* ===== Paleta "Terracota & Crema" =====
+     Papel crema cálido · tinta espresso · acento terracota
+     Crema #f5efe2 · Espresso #38291e · Terracota #bf5b34   */
+  --color-ink: oklch(0.27 0.035 55);
+  --color-ink-soft: oklch(0.38 0.04 55);
+  --color-paper: oklch(0.955 0.024 85);
+  --color-paper-deep: oklch(0.925 0.028 84);
+
+  /* Terracota (acento principal) */
+  --color-wine-50: oklch(0.965 0.018 45);
+  --color-wine-100: oklch(0.93 0.04 45);
+  --color-wine-200: oklch(0.87 0.07 45);
+  --color-wine-300: oklch(0.79 0.105 45);
+  --color-wine-400: oklch(0.68 0.135 45);
+  --color-wine-500: oklch(0.58 0.15 45);
+  --color-wine-600: oklch(0.51 0.145 45);
+  --color-wine-700: oklch(0.43 0.12 45);
+  --color-wine-800: oklch(0.35 0.095 45);
+  --color-wine-900: oklch(0.28 0.072 45);
+
+  /* Cafés cálidos */
+  --color-sepia-50: oklch(0.96 0.012 70);
+  --color-sepia-100: oklch(0.92 0.02 68);
+  --color-sepia-200: oklch(0.855 0.03 65);
+  --color-sepia-300: oklch(0.765 0.04 62);
+  --color-sepia-400: oklch(0.66 0.048 60);
+  --color-sepia-500: oklch(0.56 0.05 58);
+  --color-sepia-600: oklch(0.47 0.045 57);
+  --color-sepia-700: oklch(0.40 0.04 56);
+  --color-sepia-800: oklch(0.335 0.035 55);
+  --color-sepia-900: oklch(0.27 0.03 55);
+
+  /* Caramelo */
+  --color-bronze-100: oklch(0.93 0.028 80);
+  --color-bronze-200: oklch(0.87 0.045 80);
+  --color-bronze-300: oklch(0.79 0.065 78);
+  --color-bronze-400: oklch(0.70 0.085 76);
+  --color-bronze-500: oklch(0.61 0.095 74);
+  --color-bronze-600: oklch(0.51 0.085 72);
+  --color-bronze-700: oklch(0.42 0.07 70);
+
+  /* Verde éxito cálido — solo semántica "en línea / éxito" */
+  --color-olive-100: oklch(0.93 0.03 150);
+  --color-olive-200: oklch(0.86 0.05 150);
+  --color-olive-300: oklch(0.77 0.07 150);
+  --color-olive-400: oklch(0.66 0.085 150);
+  --color-olive-500: oklch(0.56 0.09 150);
+  --color-olive-600: oklch(0.48 0.075 150);
+  --color-olive-700: oklch(0.40 0.06 150);
+}
+
+/* ============================================================
+   DEVPLAY — Tema "Terracota & Crema" (único tema)
+   Papel crema · tinta espresso · acento terracota retro 70s
+   Caligrafía: Fraunces (display) + Bitter (cuerpo)
+   ============================================================ */
+
+:root {
+  --radius: 0.25rem;
+
+  /* Fondo: papel crema cálido */
+  --background: oklch(0.955 0.024 85);
+  --foreground: oklch(0.27 0.035 55);
+
+  /* Tarjetas: papel más claro */
+  --card: oklch(0.972 0.018 85);
+  --card-foreground: oklch(0.27 0.035 55);
+  --popover: oklch(0.975 0.016 85);
+  --popover-foreground: oklch(0.27 0.035 55);
+
+  /* Primario: terracota (botones con carácter) */
+  --primary: oklch(0.54 0.15 45);
+  --primary-foreground: oklch(0.98 0.012 85);
+
+  --secondary: oklch(0.915 0.028 82);
+  --secondary-foreground: oklch(0.33 0.04 55);
+  --muted: oklch(0.915 0.024 82);
+  --muted-foreground: oklch(0.50 0.04 58);
+  --accent: oklch(0.93 0.045 60);
+  --accent-foreground: oklch(0.42 0.12 45);
+  --destructive: oklch(0.50 0.17 30);
+  --border: oklch(0.85 0.035 78);
+  --input: oklch(0.87 0.03 78);
+  --ring: oklch(0.54 0.15 45);
+
+  --chart-1: oklch(0.54 0.15 45);
+  --chart-2: oklch(0.56 0.05 58);
+  --chart-3: oklch(0.68 0.135 45);
+  --chart-4: oklch(0.42 0.04 56);
+  --chart-5: oklch(0.61 0.095 74);
+
+  --sidebar: oklch(0.93 0.028 83);
+  --sidebar-foreground: oklch(0.27 0.035 55);
+  --sidebar-primary: oklch(0.54 0.15 45);
+  --sidebar-primary-foreground: oklch(0.98 0.012 85);
+  --sidebar-accent: oklch(0.93 0.045 60);
+  --sidebar-accent-foreground: oklch(0.42 0.12 45);
+  --sidebar-border: oklch(0.85 0.035 78);
+  --sidebar-ring: oklch(0.54 0.15 45);
+
+  --glass-bg: oklch(0.972 0.018 85 / 0.92);
+  --glass-border: oklch(0.83 0.04 78 / 0.7);
+  --glass-shadow: 0 2px 10px 0 oklch(0.27 0.035 55 / 0.10);
+
+  --gradient-primary: linear-gradient(135deg, oklch(0.32 0.04 55), oklch(0.22 0.03 55));
+  --gradient-accent: linear-gradient(135deg, oklch(0.52 0.15 45), oklch(0.40 0.12 45));
+  --gradient-sepia: linear-gradient(135deg, oklch(0.42 0.045 58), oklch(0.28 0.035 55));
+}
+
+/* ===== Modo Oscuro — cacao profundo, nunca grafito frío ===== */
+.dark {
+  --background: oklch(0.215 0.026 55);
+  --foreground: oklch(0.925 0.026 85);
+
+  --card: oklch(0.255 0.03 55);
+  --card-foreground: oklch(0.925 0.026 85);
+  --popover: oklch(0.26 0.03 55);
+  --popover-foreground: oklch(0.925 0.026 85);
+
+  /* Primario: terracota clara (visible sobre cacao) */
+  --primary: oklch(0.68 0.14 48);
+  --primary-foreground: oklch(0.17 0.025 50);
+
+  --secondary: oklch(0.305 0.033 55);
+  --secondary-foreground: oklch(0.90 0.024 82);
+  --muted: oklch(0.30 0.032 55);
+  --muted-foreground: oklch(0.68 0.035 70);
+  --accent: oklch(0.34 0.055 50);
+  --accent-foreground: oklch(0.82 0.10 50);
+  --destructive: oklch(0.64 0.18 30);
+  --border: oklch(0.94 0.02 85 / 0.14);
+  --input: oklch(0.94 0.02 85 / 0.18);
+  --ring: oklch(0.66 0.14 48);
+
+  --chart-1: oklch(0.66 0.14 48);
+  --chart-2: oklch(0.68 0.035 70);
+  --chart-3: oklch(0.74 0.11 45);
+  --chart-4: oklch(0.52 0.04 58);
+  --chart-5: oklch(0.72 0.08 74);
+
+  --sidebar: oklch(0.235 0.028 55);
+  --sidebar-foreground: oklch(0.925 0.026 85);
+  --sidebar-primary: oklch(0.68 0.14 48);
+  --sidebar-primary-foreground: oklch(0.17 0.025 50);
+  --sidebar-accent: oklch(0.34 0.055 50);
+  --sidebar-accent-foreground: oklch(0.82 0.10 50);
+  --sidebar-border: oklch(0.94 0.02 85 / 0.14);
+  --sidebar-ring: oklch(0.66 0.14 48);
+
+  --glass-bg: oklch(0.255 0.03 55 / 0.92);
+  --glass-border: oklch(0.94 0.02 85 / 0.13);
+  --glass-shadow: 0 2px 12px 0 oklch(0.10 0.02 50 / 0.40);
+
+  --gradient-primary: linear-gradient(135deg, oklch(0.90 0.028 84), oklch(0.82 0.038 82));
+  --gradient-accent: linear-gradient(135deg, oklch(0.60 0.15 45), oklch(0.45 0.12 45));
+  --gradient-sepia: linear-gradient(135deg, oklch(0.50 0.045 58), oklch(0.36 0.035 55));
+}
+
+/* ============================================================
+   Utilidades — "Papel, tinta y filetes"
+   ============================================================ */
+@layer components {
+  .glass {
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--glass-shadow);
+  }
+  .glass-strong {
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--glass-shadow);
+  }
+  .glass-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius-lg);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .glass-card:hover {
+    border-color: color-mix(in oklch, var(--foreground) 30%, var(--border));
+    box-shadow: 0 3px 14px oklch(0.27 0.035 55 / 0.16);
+  }
+
+  /* Doble filete editorial (marco de periódico) */
+  .frame-double {
+    border: 1px solid var(--border);
+    outline: 1px solid var(--border);
+    outline-offset: 3px;
+  }
+
+  /* Filete ornamental ── ◆ ── */
+  .rule-ornate {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--muted-foreground);
+  }
+  .rule-ornate::before,
+  .rule-ornate::after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background: linear-gradient(90deg, transparent, var(--border));
+  }
+  .rule-ornate::after {
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* Respetar prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .float-anim { animation: none !important; }
+    .live-pulse { animation: none !important; opacity: 0.8 !important; }
+  }
+
+  /* Texto en tinta sólida (antes degradados de color) */
+  .gradient-text,
+  .gradient-text-peach,
+  .gradient-text-mint {
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    -webkit-text-fill-color: currentColor;
+    color: var(--foreground);
+  }
+
+  /* Botones — sólidos, terracota y espresso */
+  .btn-gradient-rose,
+  .btn-gradient-lavender {
+    background: var(--gradient-accent);
+    color: oklch(0.98 0.012 85);
+    box-shadow: 0 2px 8px oklch(0.27 0.035 55 / 0.25);
+    transition: all 0.25s ease;
+  }
+  .btn-gradient-rose:hover,
+  .btn-gradient-lavender:hover {
+    box-shadow: 0 4px 14px oklch(0.27 0.035 55 / 0.35);
+    transform: translateY(-1px);
+  }
+
+  .btn-gradient-primary {
+    background: var(--gradient-primary);
+    color: var(--primary-foreground);
+    box-shadow: 0 2px 8px oklch(0.27 0.035 55 / 0.30);
+    transition: all 0.25s ease;
+  }
+  .btn-gradient-primary:hover {
+    box-shadow: 0 4px 14px oklch(0.27 0.035 55 / 0.42);
+    transform: translateY(-1px);
+  }
+  .btn-gradient-post,
+  .btn-gradient-beta,
+  .btn-gradient-live {
+    background: var(--gradient-accent);
+    color: oklch(0.98 0.012 85);
+    box-shadow: 0 2px 8px oklch(0.48 0.145 45 / 0.30);
+    transition: all 0.25s ease;
+  }
+  .btn-gradient-post:hover,
+  .btn-gradient-beta:hover,
+  .btn-gradient-live:hover {
+    box-shadow: 0 4px 14px oklch(0.48 0.145 45 / 0.42);
+    transform: translateY(-1px);
+  }
+
+  /* Tarjetas temáticas — tinte café cálido */
+  .card-rose, .card-lavender, .card-peach, .card-mint {
+    background: color-mix(in oklch, var(--card) 96%, oklch(0.55 0.05 58));
+    border: 1px solid color-mix(in oklch, oklch(0.55 0.05 58) 25%, var(--border));
+  }
+  .dark .card-rose, .dark .card-lavender, .dark .card-peach, .dark .card-mint {
+    background: color-mix(in oklch, var(--card) 94%, oklch(0.60 0.05 58));
+    border: 1px solid color-mix(in oklch, oklch(0.60 0.05 58) 30%, var(--border));
+  }
+
+  .card-themed {
+    background: color-mix(in oklch, var(--card) 96%, oklch(0.55 0.05 58));
+    border: 1px solid color-mix(in oklch, oklch(0.55 0.05 58) 25%, var(--border));
+  }
+  .dark .card-themed {
+    background: color-mix(in oklch, var(--card) 94%, oklch(0.60 0.05 58));
+    border: 1px solid color-mix(in oklch, oklch(0.60 0.05 58) 30%, var(--border));
+  }
+
+  .logo-gradient {
+    background: var(--gradient-primary);
+    box-shadow: 0 2px 8px oklch(0.27 0.035 55 / 0.30);
+  }
+  .banner-gradient {
+    background: var(--gradient-sepia);
+  }
+
+  .live-pulse {
+    animation: live-pulse 1.5s ease-in-out infinite;
+  }
+
+  /* Nav item activo — terracota sólido */
+  .nav-active {
+    background: var(--primary);
+    color: var(--primary-foreground);
+    box-shadow: 0 1px 6px oklch(0.27 0.035 55 / 0.30);
+  }
+
+  /* Textura de papel con trama de puntos (medios tonos suaves) */
+  .paper-dots {
+    background-image: radial-gradient(
+      color-mix(in oklch, var(--foreground) 4.5%, transparent) 1px,
+      transparent 1px
+    );
+    background-size: 12px 12px;
+  }
+
+  /* Sello de goma retro — terracota, girado */
+  .stamp-rubber {
+    border: 2px dashed color-mix(in oklch, oklch(0.54 0.15 45) 55%, transparent);
+    color: color-mix(in oklch, oklch(0.54 0.15 45) 85%, var(--foreground));
+    transform: rotate(-8deg);
+    border-radius: 9999px;
+  }
+  .dark .stamp-rubber {
+    border-color: color-mix(in oklch, oklch(0.68 0.14 48) 45%, transparent);
+    color: color-mix(in oklch, oklch(0.68 0.14 48) 80%, var(--foreground));
+  }
+
+  /* Cinta de teletipo — marquee infinito de la gaceta */
+  .ticker-track {
+    display: flex;
+    width: max-content;
+    animation: ticker-scroll 36s linear infinite;
+  }
+  .ticker-track:hover {
+    animation-play-state: paused;
+  }
+  @keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Tira de película — perforaciones arriba y abajo */
+  .film-strip {
+    position: relative;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        color-mix(in oklch, var(--foreground) 22%, transparent) 0 14px,
+        transparent 14px 26px
+      ) 0 0 / 100% 6px no-repeat,
+      repeating-linear-gradient(
+        90deg,
+        color-mix(in oklch, var(--foreground) 22%, transparent) 0 14px,
+        transparent 14px 26px
+      ) 0 100% / 100% 6px no-repeat;
+    padding: 14px 0;
+  }
+}
+
+/* ===== Animaciones ===== */
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.65; transform: scale(1.15); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.float-anim {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* ===== Scrollbar cálido ===== */
+.custom-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--muted-foreground) 40%, transparent);
+  border-radius: 0;
+}
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklch, var(--muted-foreground) 60%, transparent);
+}
+
+/* ===== Driver.js (tour) — tarjeta crema retro "Terracota & Crema" ===== */
+.driver-popover.driverjs-theme {
+  background: color-mix(in oklch, var(--background) 92%, var(--accent));
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 2px solid var(--primary);
+  color: var(--foreground);
+  /* Marco doble retro: borde interior crema + sombra terracota desplazada */
+  box-shadow:
+    inset 0 0 0 4px color-mix(in oklch, var(--background) 85%, white),
+    8px 8px 0 color-mix(in oklch, var(--primary) 30%, transparent),
+    0 24px 48px rgba(0, 0, 0, 0.18);
+  border-radius: var(--radius-lg);
+  max-width: 380px;
+  padding: 1.25rem 1.35rem 1.1rem;
+}
+.driver-popover.driverjs-theme .driver-popover-title {
+  color: var(--primary);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.3rem;
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+}
+.driver-popover.driverjs-theme .driver-popover-description {
+  color: var(--foreground);
+  opacity: 0.82;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.driver-popover.driverjs-theme .driver-popover-progress-text {
+  color: var(--muted-foreground);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.driver-popover.driverjs-theme .driver-popover-navigation-btns {
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.driver-popover.driverjs-theme button {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  text-shadow: none;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.5rem 1.05rem;
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+.driver-popover.driverjs-theme button:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.driver-popover.driverjs-theme button.driver-popover-prev-btn {
+  background: transparent;
+  color: var(--muted-foreground);
+  border: 1.5px solid var(--border);
+}
+.driver-popover.driverjs-theme button.driver-popover-prev-btn:hover {
+  color: var(--foreground);
+  border-color: var(--muted-foreground);
+}
+/* Puntito decorativo ✦ arriba del popover */
+.driver-popover.driverjs-theme::before {
+  content: '✦';
+  position: absolute;
+  top: 0.65rem;
+  right: 1rem;
+  color: var(--accent-foreground);
+  opacity: 0.5;
+  font-size: 0.9rem;
+}
+/* El cierre (×) del popover, discreto y alineado */
+.driver-popover.driverjs-theme .driver-popover-close-btn {
+  color: var(--muted-foreground);
+  font-size: 1.1rem;
+}
+.driver-popover.driverjs-theme .driver-popover-close-btn:hover {
+  color: var(--primary);
+}
+
+/* ===== Toasts retro (sonner) — "Terracota & Crema" 🍞 ===== */
+.toast-retro {
+  border: 2px solid var(--primary) !important;
+  border-radius: var(--radius-lg) !important;
+  background: color-mix(in oklch, var(--background) 94%, var(--accent)) !important;
+  color: var(--foreground) !important;
+  box-shadow:
+    6px 6px 0 color-mix(in oklch, var(--primary) 22%, transparent),
+    0 16px 40px rgba(0, 0, 0, 0.18) !important;
+  font-family: var(--font-bitter), Georgia, serif;
+  padding: 0.85rem 1rem !important;
+  gap: 0.5rem;
+}
+.toast-retro-title {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -0.005em;
+}
+.toast-retro-desc {
+  color: var(--muted-foreground);
+  opacity: 0.92;
+}
+.toast-retro-action {
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border-radius: 999px !important;
+  font-weight: 700;
+}
+.toast-retro-cancel {
+  background: transparent !important;
+  color: var(--muted-foreground) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 999px !important;
+  font-weight: 600;
+}
+/* Acento por tipo de aviso: borde e icono cambian de color */
+.toast-retro[data-type='success'] {
+  border-color: oklch(0.62 0.13 150) !important;
+  box-shadow:
+    6px 6px 0 color-mix(in oklch, oklch(0.62 0.13 150) 25%, transparent),
+    0 16px 40px rgba(0, 0, 0, 0.18) !important;
+}
+.toast-retro[data-type='error'] {
+  border-color: oklch(0.58 0.19 25) !important;
+  box-shadow:
+    6px 6px 0 color-mix(in oklch, oklch(0.58 0.19 25) 25%, transparent),
+    0 16px 40px rgba(0, 0, 0, 0.18) !important;
+}
+.toast-retro[data-type='warning'] {
+  border-color: oklch(0.75 0.15 75) !important;
+  box-shadow:
+    6px 6px 0 color-mix(in oklch, oklch(0.75 0.15 75) 25%, transparent),
+    0 16px 40px rgba(0, 0, 0, 0.18) !important;
+}
+.toast-retro[data-type='info'] {
+  border-color: var(--primary) !important;
+}
+
+/* ============================================================
+   SISTEMA DE TIPOGRAFÍA — "Retro 70s cálido"
+   Display: Fraunces (serif suave y regordeta, onda 70s)
+   Body: Bitter (slab robusta, sin cursivas)
+   ============================================================ */
+.text-page {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-size: 2.25rem; line-height: 2.5rem;
+  font-weight: 700; letter-spacing: -0.01em;
+}
+.text-section {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-size: 1.5rem; line-height: 2rem;
+  font-weight: 700; letter-spacing: -0.005em;
+}
+.text-card {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-size: 1.125rem; line-height: 1.6rem;
+  font-weight: 700;
+}
+.text-body { font-size: 0.9375rem; line-height: 1.55rem; font-weight: 400; }
+.text-meta {
+  font-size: 0.75rem; line-height: 1rem; font-weight: 500;
+  color: var(--muted-foreground);
+}
+.text-tiny {
+  font-size: 0.6875rem; line-height: 0.875rem; font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+/* Etiqueta editorial en versalitas espaciadas */
+.label-caps {
+  font-family: var(--font-bitter), Georgia, serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--muted-foreground);
+}
+
+/* Headings globales usan la display serif */
+h1, h2, h3 {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  letter-spacing: -0.005em;
+}
+
+/* Capital inicial editorial para párrafos destacados */
+.drop-cap::first-letter {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 3em;
+  line-height: 0.85;
+  float: left;
+  padding-right: 0.08em;
+  padding-top: 0.05em;
+  font-weight: 700;
+}
+
+/* ============================================================
+   BASE — crema / espresso, Bitter de lectura
+   ============================================================ */
+body {
+  font-family: var(--font-bitter), Georgia, "Times New Roman", serif;
+  background: var(--background);
+}
+
+::selection {
+  background: color-mix(in oklch, oklch(0.55 0.15 45) 26%, transparent);
+  color: var(--foreground);
+}
+
+/* ============================================================
+   SKELETONS CON SHIMMER
+   ============================================================ */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+  background: var(--secondary);
+}
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklch, var(--foreground) 6%, transparent),
+    transparent
+  );
+  animation: shimmer-sweep 1.8s infinite;
+}
+@keyframes shimmer-sweep {
+  100% { transform: translateX(100%); }
+}
+
+/* ============================================================
+   MICRO-INTERACCIONES
+   ============================================================ */
+.like-pop {
+  animation: like-pop-anim 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes like-pop-anim {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.4) rotate(-8deg); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.count-bump {
+  animation: count-bump-anim 0.3s ease-out;
+}
+@keyframes count-bump-anim {
+  0% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(-4px); opacity: 0.5; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Card hover — sombra espresso, sin glow */
+.card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px oklch(0.27 0.035 55 / 0.18);
+  border-color: color-mix(in oklch, var(--foreground) 32%, var(--border));
+}
+
+.btn-press {
+  transition: transform 0.1s ease;
+}
+.btn-press:active {
+  transform: scale(0.96);
+}
+
+.fade-in {
+  animation: fade-in-anim 0.3s ease-out;
+}
+@keyframes fade-in-anim {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stagger-item {
+  opacity: 0;
+  animation: stagger-anim 0.4s ease-out forwards;
+}
+@keyframes stagger-anim {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.typing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+  animation: typing-bounce 1.4s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+.notif-pulse {
+  animation: notif-pulse-anim 2s infinite;
+}
+@keyframes notif-pulse-anim {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, oklch(0.55 0.15 45) 40%, transparent); }
+  50% { box-shadow: 0 0 0 6px transparent; }
+}
+
+/* Scroll suave */
+html { scroll-behavior: smooth; }
+
+/* recache 1788399601 */
+
+  /* Cinta de teletipo inversa — segunda fila del hero, va hacia la derecha */
+  .ticker-track-reverse {
+    animation: ticker-scroll-reverse 42s linear infinite;
+  }
+  .ticker-track-reverse:hover {
+    animation-play-state: paused;
+  }
+  @keyframes ticker-scroll-reverse {
+    from { transform: translateX(-50%); }
+    to { transform: translateX(0); }
+  }
