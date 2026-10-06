@@ -46,3 +46,5 @@ ignore = ["B008"]
 [tool.ruff.lint.per-file-ignores]
 # Las plantillas HTML de correo son bloques largos a propósito
 "app/utils/mailer.py" = ["E501"]
+# El prompt de Pixel se copia literal de devplay-main (textos en una sola línea)
+"app/services/buddy_service.py" = ["E501"]

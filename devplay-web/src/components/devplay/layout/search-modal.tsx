@@ -47,8 +47,7 @@ export function SearchModal({
   const { data, isLoading } = useQuery({
     queryKey: ['search', query],
     queryFn: async () => {
-      // M4 (search) todavía no está en la API de FastAPI: devolvemos vacío
-      // en vez de romper. Cuando exista GET /search, se cambia solo esta función.
+      // GET /search de la API de FastAPI (mínimo 2 caracteres, como aquí)
       const res = await api.searchUsers(query)
       return res
     },

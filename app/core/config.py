@@ -38,6 +38,12 @@ class Settings(BaseSettings):
     # Si no se define, se usa jwt_secret.
     realtime_secret: str | None = None
 
+    # Cerebro de Pixel (GLM vía Z.ai, API compatible con OpenAI).
+    # Sin clave el endpoint /buddy responde en modo demo.
+    zai_api_key: str | None = None
+    zai_model: str = "glm-4.5-flash"
+    zai_base_url: str = "https://api.z.ai/api/paas/v4"
+
 
 @lru_cache
 def get_settings() -> Settings:

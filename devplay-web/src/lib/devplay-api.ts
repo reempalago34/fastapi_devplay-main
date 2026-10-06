@@ -573,28 +573,21 @@ export const api = {
   getRealtimeToken: () => fetchJson<{ token: string }>('/realtime-token'),
 
   /* ------------------------------------------------------------------
-   * M4 — pendientes de implementar en la API (tarea compartida con Erick)
-   * Stubs que devuelven vacío para que la UI no se rompa. Cuando se
-   * escriban los endpoints reales, se cambia SOLO el cuerpo de estos dos.
+   * M4 — search, discover y buddy ya existen en la API de FastAPI.
    * ---------------------------------------------------------------- */
 
   /** GET /search?q= — busca usuarios y posts. */
-  searchUsers: async (_query: string): Promise<{ users: unknown[]; posts: unknown[] }> => ({
-    users: [],
-    posts: [],
-  }),
+  searchUsers: (query: string) =>
+    fetchJson<{ q: string; users: unknown[]; posts: unknown[] }>(
+      `/search?q=${encodeURIComponent(query)}`
+    ),
 
-
-/** POST /buddy — el Pixel Buddy. */
-  askBuddy: async (
-    _messages: unknown[]
-  ): Promise<{ reply?: string; error?: string; actions?: BuddyAction[] }> => ({
-    reply: 'El Pixel Buddy todavía no está conectado a la API 😅',
-    /* `actions` son los gestos/saltos que el buddy ejecuta (gesto, ir a otra
-       vista). Sin endpoint no hay nada que ejecutar, asi que se devuelve vacio
-       en vez de `undefined` para que el `.map` del componente no falle. */
-    actions: [],
-  }),
+  /** POST /buddy — el Pixel Buddy (solo registrados; sin ZAI_API_KEY responde en modo demo). */
+  askBuddy: (messages: unknown[]) =>
+    fetchJson<{ reply?: string; error?: string; actions?: BuddyAction[] }>('/buddy', {
+      method: 'POST',
+      ...json({ messages }),
+    }),
 }
 
 export default api

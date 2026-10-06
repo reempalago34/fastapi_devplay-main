@@ -535,7 +535,7 @@ export function PixelBuddy() {
     setThinking(true)
     nudgeTalk(15000)
     try {
-      // M4 (buddy) todavía no está en la API de FastAPI.
+      // POST /buddy: devuelve { reply, actions } (acciones [[ir:]]/[[gesto:]])
       const data = await api.askBuddy(next)
       setMessages((m) => [...m, { role: 'assistant', content: data.reply || data.error || 'Ay, se me nublaban los circuitos 🤖' }])
       nudgeTalk(2600)
