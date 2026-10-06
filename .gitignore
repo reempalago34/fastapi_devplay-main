@@ -18,3 +18,11 @@ alembic/versions/*.pyc
 .idea/
 .vscode/
 .DS_Store
+
+# --- Frontend Next.js (devplay-web) ---
+devplay-web/node_modules/
+devplay-web/.next/
+devplay-web/out/
+devplay-web/*.tsbuildinfo
+devplay-web/.env.local
+devplay-web/.vercel/
