@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
+import { LikeConfetti } from '@/components/devplay/like-confetti'
 import { Badge } from '@/components/ui/badge'
 import {
   Heart,
@@ -26,6 +27,9 @@ export function PostCard({ post, onChange }: { post: Post; onChange?: () => void
   const { openAuth, openPostDetail, openProfile } = useUIStore()
   const [liked, setLiked] = useState(post.liked)
   const [likesCount, setLikesCount] = useState(post.likesCount)
+  /** Origen de la próxima ráfaga de confeti. `null` = no hay ninguna. */
+  const [burst, setBurst] = useState<{ x: number; y: number } | null>(null)
+  const likeBtnRef = useRef<HTMLButtonElement | null>(null)
 
   const canInteract = isAuthed && !isGuest
   const isAuthor = user?.id === post.author.id
@@ -45,11 +49,20 @@ export function PostCard({ post, onChange }: { post: Post; onChange?: () => void
         setLikesCount((c) => c + 1)
       }
     } else {
+      /* Ráfaga de confeti desde el botón, solo al dar like (no al quitar).
+         `burst` guarda un {x, y} y LikeConfetti se dibuja ahí; es un no-op
+         si el navegador no soporta la API o si el elemento no está en pantalla. */
+      if (likeBtnRef.current) {
+        const r = likeBtnRef.current.getBoundingClientRect()
+        setBurst({ x: r.left + r.width / 2, y: r.top + r.height / 2 })
+      }
       setLiked(true)
       setLikesCount((c) => c + 1)
       try {
         await api.like(post.id)
       } catch {
+        /* La API falló: se revierte el contador. El confeti ya salió y no se
+           deshace; se desvanece solo en 1.7s. */
         setLiked(false)
         setLikesCount((c) => c - 1)
       }
@@ -91,7 +104,10 @@ export function PostCard({ post, onChange }: { post: Post; onChange?: () => void
     <motion.article
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card overflow-hidden"
+      /* `card-tilt` hace el efecto 3D al pasar el ratón (ver CSS). El `y` del
+         animate de arriba y el del tilt se combinan: el tilt usa `translateZ`
+         y `rotateX` en una capa aparte, así que no se pisan. */
+      className="glass-card overflow-hidden card-tilt"
     >
       {/* Header */}
       <div className="flex items-center gap-3 p-4 pb-2">
@@ -169,6 +185,7 @@ export function PostCard({ post, onChange }: { post: Post; onChange?: () => void
           variant="ghost"
           size="sm"
           onClick={handleLike}
+          ref={likeBtnRef}
           className={cn('gap-1.5', liked && 'text-red-500')}
         >
           <Heart className={cn('h-4 w-4', liked && 'fill-current')} />
@@ -201,6 +218,11 @@ export function PostCard({ post, onChange }: { post: Post; onChange?: () => void
           <Share2 className="h-4 w-4" />
         </Button>
       </div>
+
+      {/* Ráfaga de confeti. Va dentro de la tarjeta pero con `position: fixed`
+          (ver CSS), así que sale desde el corazón aunque el post esté en el
+          medio de un scroll largo. */}
+      <LikeConfetti on={burst} />
     </motion.article>
   )
 }
