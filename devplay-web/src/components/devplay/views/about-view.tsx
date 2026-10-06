@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, ShieldCheck, FileText, Cookie, HeartHandshake, Mail } from 'lucide-react'
+import { PixelDashDemo } from '@/components/devplay/demo-game'
 
 /**
  * Vista "Acerca de DevPlay" 📜
@@ -177,6 +178,18 @@ export function AboutView() {
           Red social para desarrolladores y testers de videojuegos indie
         </p>
         <p className="text-sm text-muted-foreground mt-1">v1.0 · MVP</p>
+      </motion.div>
+
+      {/* Demo: minijuego de canvas. Va arriba del todo para que se vea sin
+          tener que hacer scroll. Para quitarlo, borrar este bloque y el
+          import de PixelDashDemo. */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="mx-auto w-full max-w-xl"
+      >
+        <PixelDashDemo />
       </motion.div>
 
       {/* ¿Qué es? */}
