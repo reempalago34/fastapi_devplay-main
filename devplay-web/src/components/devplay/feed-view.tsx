@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { EmptyState } from '@/components/devplay/shared/skeletons'
 import { api, type Post } from '@/lib/devplay-api'
 import { PostCard } from './post-card'
 import { useUIStore } from '@/lib/stores'
@@ -111,22 +112,27 @@ export function FeedView() {
 
       {/* Empty state */}
       {!isLoading && sorted.length === 0 && filter !== 'live' && (
-        <div className="glass-card p-12 text-center">
-          <Gamepad2 className="mx-auto mb-3 h-12 w-12 text-muted-foreground" />
-          <p className="font-semibold text-lg">Aún no hay publicaciones</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Sé el primero en compartir algo con la comunidad
-          </p>
-          {isGuest ? (
-            <Button className="mt-4" onClick={() => openAuth('register')}>
-              Crear cuenta para publicar
-            </Button>
-          ) : (
-            <p className="text-xs text-muted-foreground mt-4">
-              Usa el botón "Crear" en la parte superior
-            </p>
-          )}
-        </div>
+        /* Estado vacío con la pantalla de consola. El texto de abajo cambia según
+           haya sesión o no: al invitado le offered registro, al que ya tiene
+           cuenta se le recuerda el botón de crear. */
+        <EmptyState
+          icon="default"
+          style="console"
+          title="Aún no hay publicaciones"
+          description="Sé el primero en compartir algo con la comunidad"
+          lines={['$ devplay feed', '$ 0 posts', '$ esperando a alguien que publique...', '$ _']}
+          action={
+            isGuest ? (
+              <Button className="btn-gradient-primary rounded-sm" onClick={() => openAuth('register')}>
+                Crear cuenta para publicar
+              </Button>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Usa el botón "Crear" en la parte superior
+              </p>
+            )
+          }
+        />
       )}
 
       {/* End spacer */}

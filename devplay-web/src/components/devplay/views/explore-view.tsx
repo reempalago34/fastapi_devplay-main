@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { UserAvatar } from '@/components/devplay/shared/shared'
 import { HeroTicker } from '@/components/devplay/shared/hero-ticker'
+import { EmptyState } from '@/components/devplay/shared/skeletons'
 import { cn } from '@/lib/utils'
 
 type FeedFilter = 'foryou' | 'following' | 'all' | 'trending' | 'devlogs' | 'news'
@@ -300,18 +301,23 @@ export function ExploreView() {
           ))}
         </div>
       ) : (
-        <div className="glass-card p-12 text-center">
-          <Gamepad2 className="mx-auto mb-3 h-12 w-12 text-muted-foreground/40" />
-          <p className="font-semibold text-lg">Aun no hay publicaciones</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Se el primero en compartir algo con la comunidad
-          </p>
-          {isGuest && (
-            <Button className="btn-gradient-primary mt-4 rounded-sm" onClick={() => openAuth('register')}>
-              Crear cuenta para publicar
-            </Button>
-          )}
-        </div>
+        /* Estado vacío del feed. Se usa EmptyState en vez del div a mano para que
+           tenga la pantalla de consola; el botón de "crear cuenta" se pasa
+           como `action` para que quede debajo. */
+        <EmptyState
+          icon="default"
+          style="console"
+          title="Aun no hay publicaciones"
+          description="Se el primero en compartir algo con la comunidad"
+          lines={['$ devplay feed --scan', '$ 0 publicaciones', '$ esperando al primer dev...', '$ _']}
+          action={
+            isGuest ? (
+              <Button className="btn-gradient-primary rounded-sm" onClick={() => openAuth('register')}>
+                Crear cuenta para publicar
+              </Button>
+            ) : undefined
+          }
+        />
       )}
 
       <div className="h-8" />

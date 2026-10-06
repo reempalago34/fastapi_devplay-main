@@ -48,16 +48,32 @@ export function GridSkeleton({ count = 4 }: { count?: number }) {
 }
 
 // ===== Empty State con ilustración SVG =====
+
+/**
+ * Estado vacío. Hay dos estilos:
+ *  - `plain` (por defecto): tarjeta de cristal, como estaba.
+ *  - `console`: además mete la "pantalla de consola" retro — un marco con
+ *    líneas de texto de terminal y un cursor parpadeante. Solo cambia el marco;
+ *    la ilustración de arriba se mantiene.
+ *
+ * El modo `console` se elige vista a vista: en el feed y el perfil queda bien,
+ * pero dentro de un modal pequeño estorba.
+ */
 export function EmptyState({
   icon = 'default',
   title,
   description,
   action,
+  style = 'plain',
+  /** Líneas de la pantalla de consola. Si no se pasan, se generan de ejemplo. */
+  lines,
 }: {
   icon?: 'default' | 'search' | 'video' | 'beta' | 'chat' | 'store'
   title: string
   description?: string
   action?: React.ReactNode
+  style?: 'plain' | 'console'
+  lines?: string[]
 }) {
   const illustrations: Record<string, React.ReactNode> = {
     default: <DefaultIllustration />,
@@ -79,7 +95,40 @@ export function EmptyState({
           {description}
         </p>
       )}
+
+      {style === 'console' && (
+        <ConsoleScreen lines={lines ?? ['> devplay feed --scan', '> 0 resultados', '> _']} />
+      )}
+
       {action && <div className="mt-4">{action}</div>}
+    </div>
+  )
+}
+
+/**
+ * Pantalla de consola retro: marco con scanlines, unas líneas de texto y un
+ * cursor de bloque parpadeante. Puramente decorativo (`aria-hidden`), porque
+ * la información real ya está en el título y la descripción de arriba: leerlo
+ * dos veces sería redundante para quien usa lector de pantalla.
+ */
+function ConsoleScreen({ lines }: { lines: string[] }) {
+  return (
+    <div
+      aria-hidden="true"
+      className="console-screen mx-auto mt-5 w-full max-w-sm overflow-hidden rounded-sm text-left"
+    >
+      <div className="console-screen__crt" aria-hidden="true" />
+      <div className="console-screen__body px-4 py-3 font-mono text-[11px] leading-relaxed">
+        {lines.map((l, i) => (
+          <p key={i} className="truncate">
+            {l}
+          </p>
+        ))}
+        <p className="flex items-center gap-1">
+          <span>&gt;</span>
+          <span className="console-screen__cursor" />
+        </p>
+      </div>
     </div>
   )
 }

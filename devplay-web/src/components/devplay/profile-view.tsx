@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Badge } from '@/components/ui/badge'
 import { api } from '@/lib/devplay-api'
 import { followService, uploadService, userService } from '@/services/devplay-service'
+import { EmptyState } from '@/components/devplay/shared/skeletons'
 import { useCurrentUser } from '@/hooks/use-current-user'
 import { useUIStore } from '@/lib/stores'
 import { toast } from 'sonner'
@@ -181,9 +182,19 @@ export function ProfileView({ userId }: { userId: string }) {
 
         <TabsContent value="posts" className="space-y-4 mt-4">
           {normalPosts.length === 0 ? (
-            <div className="glass-card p-8 text-center text-muted-foreground">
-              Sin publicaciones aún
-            </div>
+            /* Estado vacío con pantalla de consola. El texto distingue si es tu propio
+             perfil ("aún no has publicado") o el de otro usuario. */
+            <EmptyState
+              icon="default"
+              style="console"
+              title={isMe ? 'Aún no has publicado' : 'Sin publicaciones aún'}
+              description={
+                isMe
+                  ? 'Tu perfil está vacío. Cuando publiques, aparecerá aquí.'
+                  : 'Este usuario todavía no ha compartido nada.'
+              }
+              lines={[`$ devplay profile --user ${user.username}`, '$ 0 posts', '$ _']}
+            />
           ) : (
             normalPosts.map((p) => (
               <PostCard key={p.id} post={p} onChange={() => refetch()} />
@@ -193,6 +204,9 @@ export function ProfileView({ userId }: { userId: string }) {
 
         <TabsContent value="betas" className="space-y-4 mt-4">
           {betaPosts.length === 0 ? (
+            /* Pesta de betas vacía. Aquí NO va la pantalla de consola: el mensaje suele
+             ser "no es desarrollador", que es un dato seco y la consola de
+             terminal lo hace más raro de leer. Se deja la tarjeta simple. */
             <div className="glass-card p-8 text-center text-muted-foreground">
               {user.role === 'DEV' ? 'Aún no ha subido betas' : 'Este usuario no es desarrollador'}
             </div>
