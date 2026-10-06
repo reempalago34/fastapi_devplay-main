@@ -97,30 +97,70 @@ function Label({ text, from }: { text: string; from: string }) {
   )
 }
 
-export function HeroTicker({ games, onOpenGame }: { games: TickerGame[]; onOpenGame?: (id: string) => void }) {
-  const list = games.filter(g => g.title)
+/* Contenido de reserva para cuando la API no devuelve ninguna beta todavía.
+   Sin esto las cintas no se veían en local (la BD está vacía) y el bloque
+   quedaba como un hueco raro bajo el hero. Estos son nombres y géneros
+   plausibles: es decorado, no son datos reales de la base. */
+const PLACEHOLDER_GAMES: TickerGame[] = [
+  { id: 'ph-1', title: 'Neon Drift',        version: 'v0.4.2', genre: 'Racing',      downloads: 12840 },
+  { id: 'ph-2', title: 'Pixel Farm',        version: 'v1.0.0', genre: 'Simulador',   downloads: 9320 },
+  { id: 'ph-3', title: 'Void Walker',       version: 'v0.2.1', genre: 'Plataformas', downloads: 7615 },
+  { id: 'ph-4', title: 'Café Píxel',       version: 'v0.9.0', genre: 'Gestión',     downloads: 6430 },
+  { id: 'ph-5', title: 'Rogue Signal',      version: 'v0.3.5', genre: 'Roguelike',   downloads: 5120 },
+  { id: 'ph-6', title: 'Arena de Codos',   version: 'v1.2.0', genre: 'Peleas',      downloads: 4388 },
+  { id: 'ph-7', title: 'Deep Signal',       version: 'v0.6.1', genre: 'Exploración', downloads: 3902 },
+  { id: 'ph-8', title: 'Turbo Manzana',     version: 'v0.1.9', genre: 'Arcade',      downloads: 2874 },
+]
+
+export function HeroTicker({
+  games,
+  onOpenGame,
+  /** Usa los juegos de ejemplo cuando `games` viene vacío. */
+  placeholder = true,
+}: {
+  games: TickerGame[]
+  onOpenGame?: (id: string) => void
+  placeholder?: boolean
+}) {
+  const real = games.filter((g) => g.title)
+  // Sin juegos reales se muestran los de ejemplo para que la cinta siempre se
+  // vea; si viene contenido de verdad, ese manda.
+  const list = real.length > 0 ? real : placeholder ? PLACEHOLDER_GAMES : []
   if (list.length === 0) return null
 
-  // Cada mitad del track debe sobrepasar el ancho de pantalla: si hay
-  // pocos juegos repetimos la secuencia hasta tener ~8 items por mitad.
+  /* Cada mitad del track debe sobrepasar el ancho de pantalla: si hay pocos
+     juegos repetimos la secuencia hasta tener ~8 items por mitad. */
   const reps = Math.max(1, Math.ceil(8 / list.length))
   const seq = Array.from({ length: reps }, () => list).flat()
+
+  /* La velocidad se ajusta a cuántos píldoras hay. Con pocas, un ciclo largo
+     se ve lento; con muchas, a velocidad fija iría demasiado rápido. El valor
+     solo elige entre tres duraciones definidas en globals.css. */
+  const speed = list.length <= 3 ? 'sm' : list.length <= 6 ? 'md' : 'lg'
 
   return (
     <div className="-mt-1 select-none">
       {/* Cinta 1 — píldoras con portada + nombre, CLICABLES (va hacia la izquierda) */}
-      <div className="relative overflow-hidden bg-[#40302A] border-y-2 border-[#D9A441]/60">
+      <div
+        className="ticker-fade-parent relative overflow-hidden bg-[#40302A] border-y-2 border-[#D9A441]/60"
+        style={{ color: '#40302A' }}
+      >
         <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_12px,rgba(217,164,65,0.05)_12px,rgba(217,164,65,0.05)_24px)] pointer-events-none" />
-        <div className="ticker-track py-2 relative">
+        {/* `ticker-track` mueve el contenido de derecha a izquierda. Al pasar
+            el ratón se pausa (CSS) para poder leer o pulsar una píldora. */}
+        <div className="ticker-track py-2 relative will-change-transform" data-count={speed}>
           <Pill games={seq} onOpen={onOpenGame} />
           <Pill games={seq} onOpen={onOpenGame} />
         </div>
         <Label text="★ En DevPlay" from="#40302A" />
       </div>
       {/* Cinta 2 — género + descargas (va hacia la derecha) */}
-      <div className="relative overflow-hidden bg-[#C05B2E] border-b-2 border-[#D9A441]/60">
+      <div
+        className="ticker-fade-parent relative overflow-hidden bg-[#C05B2E] border-b-2 border-[#D9A441]/60"
+        style={{ color: '#C05B2E' }}
+      >
         <div className="absolute inset-0 bg-[repeating-linear-gradient(-45deg,transparent,transparent_12px,rgba(64,48,42,0.08)_12px,rgba(64,48,42,0.08)_24px)] pointer-events-none" />
-        <div className="ticker-track ticker-track-reverse py-1.5 relative">
+        <div className="ticker-track ticker-track-reverse py-1.5 relative will-change-transform" data-count={speed}>
           <PillMeta games={seq} />
           <PillMeta games={seq} />
         </div>
