@@ -26,3 +26,5 @@ devplay-web/out/
 devplay-web/*.tsbuildinfo
 devplay-web/.env.local
 devplay-web/.vercel/
+.env.example
+*.example

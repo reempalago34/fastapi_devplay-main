@@ -642,10 +642,9 @@ export const storeService = {
 /* ------------------------------------------------------------ Descubrimiento (M4) */
 
 /**
- * La pantalla de Descubrir pide cinco secciones. La API no tiene todavia un
- * endpoint /discover que las agrupe, asi que se arman con los endpoints que si
- * existen y se devuelven vacias las que no. Cuando Erick escriba el agregador,
- * se cambia SOLO este bloque.
+ * La pantalla de Descubrir pide cinco secciones y ahora las arma la API en
+ * una sola llamada: GET /discover devuelve trending, recommendedUsers,
+ * popularBetas, popularTags y recent (sin lo de los bloqueos del viewer).
  */
 export interface DiscoverFeed {
   trending: any[]
@@ -657,26 +656,8 @@ export interface DiscoverFeed {
 
 export const discoverService = {
   get: async (): Promise<{ data: DiscoverFeed }> => {
-    const [posts, betas, streams] = await Promise.all([
-      api.getPosts({ limit: 10 }).then((r) => r.posts).catch(() => []),
-      api.getBetas().catch(() => [] as any[]),
-      api.getStreams().catch(() => [] as any[]),
-    ])
-
-    /* Los directos activos son lo "trending" del momento; si no hay ninguno se
-       cae al feed reciente para que la seccion nunca se vea vacia. */
-    const live = streams.filter((s: any) => s.isLive || s.is_live)
-    const trending = live.length > 0 ? live : posts
-
-    return {
-      data: {
-        trending,
-        recommendedUsers: [],
-        popularBetas: betas,
-        popularTags: [],
-        recent: posts,
-      },
-    }
+    const data = await fetchJson<DiscoverFeed>('/discover')
+    return { data }
   },
 }
 

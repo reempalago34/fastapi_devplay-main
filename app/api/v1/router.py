@@ -3,12 +3,15 @@ from fastapi import APIRouter
 from app.api.v1 import (
     auth,
     betas,
+    buddy,
     chat,
+    discover,
     follow,
     health,
     polls,
     posts,
     realtime,
+    search,
     security,
     store,
     users,
@@ -30,3 +33,8 @@ api_router.include_router(posts.router)
 api_router.include_router(polls.router)
 api_router.include_router(betas.router)
 api_router.include_router(chat.router)
+
+# --- M4 (juntos): buscar, descubrir y el asistente Pixel ---
+api_router.include_router(search.router)
+api_router.include_router(discover.router)
+api_router.include_router(buddy.router)
