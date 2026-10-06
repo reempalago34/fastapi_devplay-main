@@ -20,7 +20,7 @@ get_settings.cache_clear()
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
-from app.core.database import engine  # noqa: E402
+from app.core.database import SessionLocal, engine  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models import Base  # noqa: E402
 
@@ -32,6 +32,23 @@ def database():
     Base.metadata.create_all(engine)
     yield
     Base.metadata.drop_all(engine)
+
+
+@pytest.fixture(autouse=True)
+def _clean_rate_limits():
+    """El rate limit vive en memoria compartida entre tests: se limpia en cada uno."""
+    from app.utils.rate_limit import _hits
+
+    _hits.clear()
+    yield
+    _hits.clear()
+
+
+@pytest.fixture()
+def db(database):
+    """Sesión de SQLAlchemy dedicada para sembrar datos desde los tests."""
+    with SessionLocal() as session:
+        yield session
 
 
 @pytest.fixture()

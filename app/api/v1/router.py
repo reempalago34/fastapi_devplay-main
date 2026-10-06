@@ -1,13 +1,32 @@
 from fastapi import APIRouter
 
-from app.api.v1 import auth, health, users
+from app.api.v1 import (
+    auth,
+    betas,
+    chat,
+    follow,
+    health,
+    polls,
+    posts,
+    realtime,
+    security,
+    store,
+    users,
+)
 
 api_router = APIRouter()
 api_router.include_router(health.router)
 api_router.include_router(auth.router)
 api_router.include_router(users.router)
 
-# --- Punto de integración para el equipo ---
-# Cada nueva feature añade UNA línea aquí (un archivo de router por dominio):
-#   from app.api.v1 import content
-#   api_router.include_router(content.router)
+# --- Erick: identidad, seguridad, follow, tienda ---
+api_router.include_router(security.router)
+api_router.include_router(follow.router)
+api_router.include_router(store.router)
+api_router.include_router(realtime.router)
+
+# --- Frank: contenido, encuestas, betas, directos, chat y notificaciones ---
+api_router.include_router(posts.router)
+api_router.include_router(polls.router)
+api_router.include_router(betas.router)
+api_router.include_router(chat.router)

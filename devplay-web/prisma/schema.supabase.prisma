@@ -1,0 +1,388 @@
+// DevPlay - Prisma Schema · VERSIÓN SUPABASE (PostgreSQL) 🐘
+// Actívalo con:  bash scripts/use-supabase.sh
+// Vuelve a SQLite con:  bash scripts/use-sqlite.sh
+// DATABASE_URL debe apuntar al pooler de Supabase (puerto 6543).
+//
+// Note: SQLite no soporta enums nativos, usamos String con constantes en app.
+// Note: No usamos tipos primitivos list (mediaUrls se guarda como JSON string).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // SCHEMA PARA SUPABASE (PostgreSQL) — se activa con: bash scripts/use-supabase.sh
+  // Vuelve a SQLite con: bash scripts/use-sqlite.sh
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  username     String   @unique
+  passwordHash String?
+  // ===== OAuth =====
+  provider       String?  // "google" | "github" | null (credentials)
+  providerAccountId String? // ID de Google/GitHub
+  // ===== Recuperación de contraseña =====
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  // ===== Información personal =====
+  fullName     String?
+  bio          String?  // hasta 500 caracteres
+  avatar       String?
+  banner       String?  // foto de portada
+  location     String?  // ciudad, país
+  website      String?  // sitio web personal
+  profession   String?  // profesión
+  birthDate    DateTime?
+  // Redes sociales: JSON string { facebook, instagram, twitter, tiktok, youtube, twitch, linkedin, github, discord }
+  socialLinks  String?
+  // ===== Sistema =====
+  role         String   @default("USER")
+  tags         String?  // JSON string array de tags predefinidos
+  isGuest      Boolean  @default(false)
+  isPrivate    Boolean  @default(false) // Perfil privado (solo seguidores)
+  twoFAEnabled Boolean  @default(false)
+  lastSeen     DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  posts              Post[]
+  comments           Comment[]
+  likes              Like[]
+  bookmarks          Bookmark[]
+  followers          Follow[]      @relation("Followee")
+  following          Follow[]      @relation("Follower")
+  streams            Stream[]
+  notificationsRecv  Notification[] @relation("NotifReceiver")
+  notificationsTrig  Notification[] @relation("NotifTrigger")
+  chatMessages       ChatMessage[]
+  blockedUsers       Block[]      @relation("Blocker")
+  blockedBy          Block[]      @relation("Blocked")
+  reportsMade        Report[]     @relation("Reporter")
+  loginEvents        LoginEvent[]
+  pollVotes          PollVote[] @relation("UserPollVotes")
+  deletionCodes      AccountDeletionCode[] @relation("AccountDeletionCodes")
+  // ===== Tienda =====
+  devCoins           Int      @default(100) // Monedas virtuales iniciales
+  storePurchases     StorePurchase[] @relation("UserStorePurchases")
+  coinTransactions   DevCoinTransaction[] @relation("UserCoinTransactions")
+}
+
+model Post {
+  id         String   @id @default(cuid())
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  // Type: "POST" | "BETA" | "STREAM"
+  type       String   @default("POST")
+  content    String?
+  // JSON string: array of { url, kind: "image"|"video" }
+  mediaUrls  String?
+  // Repost: referencia al post original (null si no es repost)
+  repostOfId String?
+  repostOf   Post?    @relation("Repost", fields: [repostOfId], references: [id], onDelete: SetNull)
+  reposts    Post[]   @relation("Repost")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  beta     Beta?
+  stream   Stream?
+  poll     Poll?    @relation("PostPoll")
+  comments Comment[]
+  likes    Like[]
+  bookmarks Bookmark[]
+
+  @@index([authorId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([repostOfId])
+}
+
+model Beta {
+  id          String   @id @default(cuid())
+  postId      String   @unique
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  // "DIRECT" (file < 50MB on server) | "LINK" (external URL)
+  downloadType String
+  fileUrl      String?
+  fileSize     Int?
+  fileName     String?
+  externalUrl  String?
+
+  // ===== Campos nuevos (formulario enriquecido) =====
+  // Estado de la beta: "alpha" | "closed_beta" | "open_beta" | "tech_test" | "early_access" | "ended" | "coming_soon"
+  betaStatus   String   @default("open_beta")
+  // Género: "Plataformas", "RPG", "Puzzle", "Aventura", "Shooter", "Estrategia", "Terror", "Carreras", "Deportes", "Simulación", "Otro"
+  genre        String?
+  // Versión de la beta: "v0.1", "Alpha 1.2", etc.
+  version      String?
+  // Plataforma: JSON string array: ["PC","Mac","Linux","Android","Web"]
+  platforms    String?
+  // Tags: JSON string array: ["2D","Pixel Art","Indie","Multiplayer","Singleplayer"]
+  tags         String?
+  // Requisitos del sistema (texto libre)
+  requirements String?
+  // Notas de la versión / changelog
+  changelog    String?
+  // Instrucciones de instalación
+  installInstructions String?
+  // Imagen de portada (URL)
+  coverImage   String?
+  // Capturas de pantalla: JSON string array de URLs
+  screenshots  String?
+  // Plataforma del enlace externo: "Google Drive", "itch.io", "MediaFire", "Mega", "GitHub", "Otro"
+  externalPlatform String?
+
+  downloads   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([postId])
+}
+
+model Stream {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId     String?  @unique
+  post       Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  // Platform: "TWITCH" | "YOUTUBE" | "KICK"
+  platform   String
+  streamUrl  String
+  embedUrl   String
+  title      String
+  isLive     Boolean  @default(false)
+  startedAt  DateTime?
+  endedAt    DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([isLive])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([postId])
+  @@index([userId])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+}
+
+model Follow {
+  id         String   @id @default(cuid())
+  followerId String
+  follower   User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  followeeId String
+  followee   User     @relation("Followee", fields: [followeeId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([followerId, followeeId])
+  @@index([followerId])
+  @@index([followeeId])
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation("NotifReceiver", fields: [userId], references: [id], onDelete: Cascade)
+  fromUserId String
+  fromUser   User     @relation("NotifTrigger", fields: [fromUserId], references: [id], onDelete: Cascade)
+  // Type: "LIVE" | "FOLLOW" | "COMMENT" | "LIKE"
+  type       String
+  message    String
+  entityId   String?
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  username  String
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// ===== Seguridad =====
+
+model Block {
+  id          String   @id @default(cuid())
+  blockerId   String
+  blocker     User     @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockedId   String
+  blocked     User     @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+  @@index([blockedId])
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  reporterId  String
+  reporter    User     @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  // Type: "POST" | "USER" | "COMMENT" | "BETA"
+  type        String
+  entityId    String
+  // Reason: "spam" | "harassment" | "inappropriate" | "impersonation" | "other"
+  reason      String
+  description String?
+  status      String   @default("pending") // "pending" | "reviewed" | "resolved"
+  createdAt   DateTime @default(now())
+
+  @@index([reporterId])
+  @@index([status])
+}
+
+model LoginEvent {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email       String?
+  success     Boolean
+  ip          String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// Códigos de verificación por correo para eliminar la cuenta
+model AccountDeletionCode {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("AccountDeletionCodes", fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String   // bcrypt del código de 6 dígitos
+  expiresAt DateTime
+  consumed  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ===== Encuestas =====
+model Poll {
+  id          String   @id @default(cuid())
+  postId      String   @unique
+  post        Post     @relation("PostPoll", fields: [postId], references: [id], onDelete: Cascade)
+  question    String
+  allowMultiple Boolean @default(false)
+  closesAt    DateTime?
+  createdAt   DateTime @default(now())
+
+  options    PollOption[] @relation("PollOptions")
+
+  @@index([postId])
+}
+
+model PollOption {
+  id        String   @id @default(cuid())
+  pollId    String
+  poll      Poll     @relation("PollOptions", fields: [pollId], references: [id], onDelete: Cascade)
+  text      String
+  voteCount Int      @default(0)
+
+  votes     PollVote[] @relation("OptionVotes")
+
+  @@index([pollId])
+}
+
+model PollVote {
+  id        String   @id @default(cuid())
+  pollId    String
+  optionId  String
+  pollOption PollOption @relation("OptionVotes", fields: [optionId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation("UserPollVotes", fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([optionId, userId])
+  @@index([pollId])
+  @@index([userId])
+}
+
+// ===== Tienda =====
+model StoreItem {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Int      // Precio en DevCoins
+  category    String   // "powerup" | "avatar" | "premium" | "bundle"
+  icon        String   // Nombre del icono Lucide
+  imageUrl    String?
+  // Para power-ups
+  effect      String?  // "boost_post" | "verified" | "analytics" | etc
+  duration    Int?     // Duración en días (null = permanente)
+  createdAt   DateTime @default(now())
+
+  purchases   StorePurchase[]
+
+  @@index([category])
+}
+
+model StorePurchase {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("UserStorePurchases", fields: [userId], references: [id], onDelete: Cascade)
+  itemId    String
+  item      StoreItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  pricePaid Int      // Precio al momento de compra
+  createdAt DateTime @default(now())
+
+  @@unique([userId, itemId])
+  @@index([userId])
+}
+
+model DevCoinTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation("UserCoinTransactions", fields: [userId], references: [id], onDelete: Cascade)
+  amount      Int      // Positivo = compra, Negativo = gasto
+  type        String   // "purchase" | "reward" | "bonus" | "admin"
+  description String
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}

@@ -39,8 +39,9 @@ A partir de aquí cada dominio avanza por separado.
 | M2 | `Follow` | `follow` (GET/POST/DELETE), `users/[id]`, `users/[id]/followers`, `users/[id]/following`, `users/by-username/[username]`, `users/me/stats`, `users/me/achievements`, `users/me/bookmarks` |
 | M3 | `StoreItem`, `StorePurchase`, `DevCoinTransaction` | `store/items`, `store/buy`, `store/balance`, `store/my-items` |
 
-Además: termina el flujo de registro con código de 6 dígitos (`LoginCode` +
-SMTP), `forgot-password` / `reset-password`, `auth/guest` y `realtime-token`.
+Además — **Erick ✅ Hecho**: registro con código de 6 dígitos (`LoginCode` +
+SMTP o modo demo con `demoCode`), `verify-register`, `forgot-password` /
+`reset-password`, `auth/guest` y `realtime-token` (HMAC, 30 min).
 
 ### Compañero — Contenido, juegos y directos
 
@@ -114,9 +115,9 @@ main          ← siempre funciona: pytest en verde + uvicorn arranca
 | Hito | Contenido | Responsable | Estado |
 |---|---|---|---|
 | **M0** | Base: estructura, 22 modelos, JWT, health, auth, tests | Erick | ✅ Hecho |
-| **M1** | Seguridad/moderación **‖** Feed (posts/likes/comentarios) | Erick ‖ Compañero | ⬜ |
-| **M2** | Users/follow/stats **‖** Betas/polls/streams | Erick ‖ Compañero | ⬜ |
-| **M3** | Tienda DevCoins **‖** Chat/DM/notificaciones | Erick ‖ Compañero | ⬜ |
+| **M1** | Seguridad/moderación **‖** Feed (posts/likes/comentarios) | Erick ‖ Compañero | Erick ✅ / Compañero ⬜ |
+| **M2** | Users/follow/stats **‖** Betas/polls/streams | Erick ‖ Compañero | Erick ✅ / Compañero ⬜ |
+| **M3** | Tienda DevCoins **‖** Chat/DM/notificaciones | Erick ‖ Compañero | Erick ✅ / Compañero ⬜ |
 | **M4** | discover/search/buddy + integración con Next.js y realtime | Juntos | ⬜ |
 
 ## 8. Ritmo de trabajo

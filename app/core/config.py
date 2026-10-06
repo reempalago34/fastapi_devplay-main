@@ -26,6 +26,18 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = ["http://localhost:3000", "http://localhost:81"]
 
+    # SMTP (opcional). Sin configurar → modo demo: los códigos se registran en
+    # el log y vuelven en `demoCode`, igual que devplay-main/src/lib/mailer.ts
+    smtp_host: str | None = None
+    smtp_port: int = 465
+    smtp_user: str | None = None
+    smtp_pass: str | None = None
+    mail_from: str | None = None
+
+    # Secreto compartido con el mini-servicio realtime (firma HMAC del handshake).
+    # Si no se define, se usa jwt_secret.
+    realtime_secret: str | None = None
+
 
 @lru_cache
 def get_settings() -> Settings:
