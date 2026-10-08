@@ -6,8 +6,6 @@ services:
       POSTGRES_USER: erick
       POSTGRES_PASSWORD: devplay
       POSTGRES_DB: devplay_api
-    ports:
-      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -28,8 +26,8 @@ services:
       APP_ENV: ${APP_ENV:-dev}
       CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:3000"]}
       REALTIME_SECRET: ${REALTIME_SECRET:-}
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     command: >
       sh -c "alembic upgrade head &&
              uvicorn app.main:app --host 0.0.0.0 --port 8000"
