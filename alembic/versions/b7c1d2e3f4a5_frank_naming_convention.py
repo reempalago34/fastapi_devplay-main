@@ -34,6 +34,7 @@ Nombres verificados contra el catalogo (pg_constraint) en devplay_api.
 from typing import Sequence, Union
 
 from alembic import op
+from sqlalchemy import text
 
 
 revision: str = 'b7c1d2e3f4a5'
@@ -59,13 +60,35 @@ _RENAMES: tuple[tuple[str, str, str], ...] = (
 )
 
 
+def _constraint_exists(table: str, name: str) -> bool:
+    """Verifica en pg_constraint si existe un constraint con ese nombre."""
+    result = (
+        op.get_bind()
+        .execute(
+            text(
+                "SELECT 1 FROM pg_constraint c "
+                "JOIN pg_class t ON t.oid = c.conrelid "
+                "WHERE t.relname = :table AND c.conname = :name"
+            ),
+            {"table": table, "name": name},
+        )
+        .scalar()
+    )
+    return result is not None
+
+
 def _rename_all(pairs: tuple[tuple[str, str, str], ...]) -> None:
     for table, old, new in pairs:
         # Se usa op.execute con el SQL a mano en vez de op.rename_constraint()
         # porque Alembic no tiene un helper portable para esto, y porque las
         # tablas se llaman con mayuscula inicial ("User", "Beta"): "User" es
         # palabra reservada en SQL y sin las comillas el DDL falla.
-        op.execute(f'ALTER TABLE "{table}" RENAME CONSTRAINT "{old}" TO "{new}"')
+        #
+        # Solo renombra si el nombre viejo existe: en BDs frescas la migración
+        # inicial ya crea los constraints con el nombre nuevo (la convención
+        # está en los modelos), así que no hay nada que renombrar.
+        if _constraint_exists(table, old):
+            op.execute(f'ALTER TABLE "{table}" RENAME CONSTRAINT "{old}" TO "{new}"')
 
 
 def upgrade() -> None:
