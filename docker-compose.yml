@@ -26,6 +26,8 @@ services:
       DATABASE_URL: postgresql+psycopg://erick:devplay@db:5432/devplay_api
       JWT_SECRET: ${JWT_SECRET:-dev-secret-cambiar}
       APP_ENV: ${APP_ENV:-dev}
+      CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:3000"]}
+      REALTIME_SECRET: ${REALTIME_SECRET:-}
     ports:
       - "8000:8000"
     command: >
