@@ -24,7 +24,16 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
 
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:81"]
+    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:81", "http://localhost:8080", "http://127.0.0.1:8080"]
+
+    # "Cortafuegos" de aplicación: hosts permitidos y límites básicos.
+    # En producción añade tu dominio real (sin esquema ni puerto).
+    trusted_hosts: list[str] = ["localhost", "127.0.0.1", "testserver"]
+    # Actívalo solo si la API está detrás de un proxy de confianza (nginx,
+    # Cloudflare, etc.). Si se activa sin proxy, se puede falsificar la IP.
+    trust_proxy_headers: bool = False
+    max_request_body_bytes: int = 10 * 1024 * 1024
+    global_rate_limit_per_minute: int = 600
 
     # SMTP (opcional). Sin configurar → modo demo: los códigos se registran en
     # el log y vuelven en `demoCode`, igual que devplay-main/src/lib/mailer.ts
