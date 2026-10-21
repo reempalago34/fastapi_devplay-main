@@ -1,12 +1,34 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app.api.v1.router import api_router
-from app.core.config import get_settings
+from app.core.config import Settings, get_settings
+from app.services import media_service as media_svc
 from app.utils.rate_limit import check_rate_limit
 from app.utils.request import get_client_ip
+
+
+class UploadsStaticFiles(StaticFiles):
+    """Sirve la carpeta de subidas resolviendo la ruta en cada petición.
+
+    Así el directorio se lee siempre de la configuración actual (y los tests
+    pueden redirigirlo a una carpeta temporal).
+    """
+
+    def __init__(self, settings: Settings) -> None:
+        super().__init__(directory=str(media_svc.uploads_root(settings)))
+        self._settings = settings
+
+    def lookup_path(self, path: str):
+        directory = str(media_svc.uploads_root(self._settings))
+        self.directory = directory
+        # `StaticFiles` cachea los directorios en el constructor: hay que
+        # refrescarlos para que apunte a la ruta actual.
+        self.all_directories = self.get_directories(directory, self.packages)
+        return super().lookup_path(path)
 
 
 def create_app() -> FastAPI:
@@ -114,6 +136,14 @@ def create_app() -> FastAPI:
         return response
 
     app.include_router(api_router, prefix="/api/v1")
+
+    # Archivos subidos por los usuarios (avatar, portada, galería).
+    # Se sirven como estáticos desde /uploads.
+    app.mount(
+        "/uploads",
+        UploadsStaticFiles(settings),
+        name="uploads",
+    )
 
     @app.get("/", tags=["infra"], include_in_schema=False)
     def root():

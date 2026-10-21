@@ -17,6 +17,11 @@ class PostType(StrEnum):
     BETA = "BETA"
     STREAM = "STREAM"
     POLL = "POLL"
+    # Tipos que el frontend (Descubrir) ya usa y filtra:
+    GAME_SHOWCASE = "GAME_SHOWCASE"
+    DEV_LOG = "DEV_LOG"
+    UPDATE = "UPDATE"
+    ANNOUNCEMENT = "ANNOUNCEMENT"
 
 
 class BetaStatus(StrEnum):

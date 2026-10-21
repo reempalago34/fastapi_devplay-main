@@ -35,6 +35,26 @@ class Settings(BaseSettings):
     max_request_body_bytes: int = 10 * 1024 * 1024
     global_rate_limit_per_minute: int = 600
 
+    # --- Subida de archivos (avatar, portada y galería) ---
+    # Carpeta donde se guardan los archivos subidos. Se sirve en /uploads.
+    uploads_dir: str = "uploads"
+    # URL base pública para los archivos subidos.
+    public_base_url: str = "http://127.0.0.1:8000"
+    # Tamaño máximo por archivo (bytes). 8 MB.
+    max_upload_bytes: int = 8 * 1024 * 1024
+    # Formatos de imagen permitidos.
+    allowed_image_types: list[str] = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+    ]
+    # Formatos de video permitidos.
+    allowed_video_types: list[str] = [
+        "video/mp4",
+        "video/webm",
+    ]
+
     # SMTP (opcional). Sin configurar → modo demo: los códigos se registran en
     # el log y vuelven en `demoCode`, igual que devplay-main/src/lib/mailer.ts
     smtp_host: str | None = None

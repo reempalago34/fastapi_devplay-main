@@ -71,6 +71,17 @@ def make_post(client, headers, content="Hola mundo", media=None) -> dict:
     return res.json()
 
 
+def make_typed_post(client, headers, post_type: str, content="Hola mundo") -> dict:
+    """Crea un post con un tipo concreto (BETA, DEV_LOG, POLL…)."""
+    res = client.post(
+        f"{BASE}/posts",
+        json={"content": content, "type": post_type},
+        headers=headers,
+    )
+    assert res.status_code == 201, res.text
+    return res.json()
+
+
 # --- Crear ---
 
 
@@ -136,6 +147,64 @@ def test_get_feed_filter_by_author(client, author, reader):
     body = res.json()
     assert body["total"] == 1
     assert body["items"][0]["content"] == "de reader"
+
+
+def test_get_feed_filter_by_type(client, author):
+    """El filtro `type` del feed debe devolver solo publicaciones de ese tipo."""
+    make_typed_post(client, author, "BETA", "una beta")
+    make_typed_post(client, author, "DEV_LOG", "un dev log")
+    make_post(client, author, "un post normal")
+
+    res = client.get(f"{BASE}/posts", params={"type": "BETA"})
+    assert res.status_code == 200
+    body = res.json()
+    assert body["total"] == 1
+    assert body["items"][0]["type"] == "BETA"
+    assert body["items"][0]["content"] == "una beta"
+
+    res = client.get(f"{BASE}/posts", params={"type": "DEV_LOG"})
+    body = res.json()
+    assert body["total"] == 1
+    assert body["items"][0]["type"] == "DEV_LOG"
+
+    res = client.get(f"{BASE}/posts", params={"type": "POST"})
+    body = res.json()
+    assert body["total"] == 1
+    assert body["items"][0]["type"] == "POST"
+
+    # El tipo es case-insensitive.
+    res = client.get(f"{BASE}/posts", params={"type": "beta"})
+    assert res.json()["total"] == 1
+
+    # Un tipo inexistente no rompe el feed: devuelve vacío.
+    res = client.get(f"{BASE}/posts", params={"type": "NO_EXISTE"})
+    assert res.status_code == 200
+    assert res.json()["total"] == 0
+    assert res.json()["items"] == []
+
+
+def test_get_feed_sort_trending(client, author, reader):
+    """`sort=trending` ordena por likes (y a empates, por recencia)."""
+    popular = make_post(client, author, "popular")
+    nuevo = make_post(client, author, "nuevo")
+    client.post(f"{BASE}/posts/{popular['id']}/likes", headers=reader)
+    client.post(f"{BASE}/posts/{popular['id']}/likes", headers=author)
+
+    res = client.get(f"{BASE}/posts", params={"sort": "trending"})
+    assert res.status_code == 200
+    items = res.json()["items"]
+    assert items[0]["id"] == popular["id"]
+    assert items[0]["likes_count"] == 2
+
+    # `latest` mantiene el orden cronológico inverso.
+    res = client.get(f"{BASE}/posts", params={"sort": "latest"})
+    items = res.json()["items"]
+    assert items[0]["id"] == nuevo["id"]
+
+
+def test_get_feed_rejects_invalid_sort(client):
+    res = client.get(f"{BASE}/posts", params={"sort": "inventado"})
+    assert res.status_code == 422
 
 
 def test_get_post_by_id(client, author):

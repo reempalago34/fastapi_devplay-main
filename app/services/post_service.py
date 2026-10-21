@@ -35,6 +35,8 @@ def list_posts(
     limit: int = 20,
     author_id: str | None = None,
     viewer_id: str | None = None,
+    post_type: str | None = None,
+    sort: str = "latest",
 ) -> tuple[list[Post], int]:
     """Feed paginado, del más nuevo al más viejo.
 
@@ -51,8 +53,27 @@ def list_posts(
         stmt = stmt.where(Post.repost_of_id.is_(None))
         count_stmt = count_stmt.where(Post.repost_of_id.is_(None))
 
+    if post_type:
+        normalized = post_type.strip().upper()
+        stmt = stmt.where(Post.type == normalized)
+        count_stmt = count_stmt.where(Post.type == normalized)
+
     total = db.scalar(count_stmt) or 0
-    stmt = stmt.order_by(Post.created_at.desc()).offset(skip).limit(limit)
+
+    if sort == "trending":
+        # Trending = likes + recencia. El conteo se hace con una subconsulta
+        # correlacionada para no duplicar filas.
+        like_count = (
+            select(func.count(Like.id))
+            .where(Like.post_id == Post.id)
+            .correlate(Post)
+            .scalar_subquery()
+        )
+        stmt = stmt.order_by((like_count * 10).desc(), Post.created_at.desc())
+    else:
+        stmt = stmt.order_by(Post.created_at.desc())
+
+    stmt = stmt.offset(skip).limit(limit)
     return list(db.scalars(stmt).all()), total
 
 

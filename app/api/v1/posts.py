@@ -94,12 +94,27 @@ def list_posts(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     author_id: str | None = Query(None, description="Filtra por autor"),
+    type: str | None = Query(
+        None,
+        description="Filtra por tipo de publicación (POST, BETA, DEV_LOG, POLL…)",
+    ),
+    sort: str = Query(
+        "latest",
+        pattern="^(latest|trending)$",
+        description="Orden: latest (más nuevo) o trending (más popular)",
+    ),
     db: Session = Depends(get_db),
     viewer: User | None = Depends(get_optional_user),
 ):
     """Feed paginado del más nuevo al más viejo. Los reposts no aparecen aquí."""
     posts, total = svc.list_posts(
-        db, skip=skip, limit=limit, author_id=author_id, viewer_id=viewer.id if viewer else None
+        db,
+        skip=skip,
+        limit=limit,
+        author_id=author_id,
+        viewer_id=viewer.id if viewer else None,
+        post_type=type,
+        sort=sort,
     )
     return PostListOut(
         items=_serialize_many(db, posts, viewer.id if viewer else None),

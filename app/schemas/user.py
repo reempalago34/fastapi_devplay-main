@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
@@ -190,6 +191,38 @@ class PostSummary(BaseModel):
 class ProfileResponse(BaseModel):
     user: ProfileUser
     posts: list[PostSummary]
+
+
+class MediaItem(BaseModel):
+    """Un medio (imagen o video) publicado por un usuario."""
+
+    url: str
+    kind: str = "image"  # image | video
+    post_id: str = Field(alias="postId")
+    created_at: datetime = Field(alias="createdAt")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class MediaListResponse(BaseModel):
+    items: list[MediaItem]
+
+
+class UploadOut(BaseModel):
+    """Archivo subido correctamente."""
+
+    url: str
+    kind: str = "image"  # image | video
+    filename: str
+    size: int
+
+
+class OkResponse(BaseModel):
+    ok: Literal[True] = True
+
+
+class LikedPostsResponse(BaseModel):
+    items: list[PostSummary]
 
 
 # --- Seguidores / seguidos ---

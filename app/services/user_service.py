@@ -22,6 +22,7 @@ from app.schemas.user import (
     AuthorOut,
     BetaOut,
     FollowListUser,
+    MediaItem,
     PostSummary,
     ProfileUser,
     RepostSummary,
@@ -163,6 +164,20 @@ def get_profile(db, user_id: str, viewer_id: str | None) -> dict[str, Any]:
             is not None
         )
 
+    # Privacidad aplicada en el servidor (no solo ocultando botones):
+    # un perfil privado solo es visible para su dueño y sus seguidores.
+    if user.is_private and viewer_id != user_id:
+        is_follower = (
+            db.scalar(
+                select(Follow).where(
+                    Follow.follower_id == viewer_id, Follow.followee_id == user_id
+                )
+            )
+            is not None
+        )
+        if not is_follower:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "Perfil privado")
+
     posts = db.scalars(
         select(Post)
         .where(Post.author_id == user_id)
@@ -269,6 +284,79 @@ def list_following(db, user_id: str) -> list[FollowListUser]:
 
 def by_username(db, username: str) -> User | None:
     return db.scalar(select(User).where(User.username == username))
+
+
+# --------------------------- Contenido por pestaña ---------------------------
+
+
+def list_liked_posts(
+    db, user_id: str, viewer_id: str | None, limit: int = 50
+) -> list[PostSummary]:
+    """Publicaciones que el usuario ha marcado como 'me gusta'.
+
+    Solo se exponen si el perfil es público o si el visor es el propio
+    usuario (privacidad aplicada en el servidor, no solo en la interfaz).
+    """
+    user = db.get(User, user_id)
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No encontrado")
+    if user.is_private and viewer_id != user_id:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Perfil privado")
+
+    posts = db.scalars(
+        select(Post)
+        .join(Like, Like.post_id == Post.id)
+        .where(Like.user_id == user_id)
+        .options(
+            selectinload(Post.author),
+            selectinload(Post.beta),
+            selectinload(Post.stream),
+            selectinload(Post.repost_of).selectinload(Post.author),
+            selectinload(Post.repost_of).selectinload(Post.beta),
+            selectinload(Post.repost_of).selectinload(Post.stream),
+        )
+        .order_by(Like.created_at.desc())
+        .limit(limit)
+    ).all()
+    return serialize_posts(db, posts, viewer_id)
+
+
+def list_user_media(
+    db, user_id: str, viewer_id: str | None, limit: int = 60
+) -> list[MediaItem]:
+    """Galería de medios (imágenes y videos) publicados por el usuario."""
+    user = db.get(User, user_id)
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No encontrado")
+    if user.is_private and viewer_id != user_id:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Perfil privado")
+
+    posts = db.scalars(
+        select(Post)
+        .where(Post.author_id == user_id)
+        .order_by(Post.created_at.desc())
+        .limit(100)
+    ).all()
+
+    items: list[MediaItem] = []
+    for post in posts:
+        for media in loads_json(post.media_urls, []):
+            if not isinstance(media, dict):
+                continue
+            url = str(media.get("url") or "")
+            if not url:
+                continue
+            items.append(
+                MediaItem(
+                    url=url,
+                    kind=str(media.get("kind") or "image"),
+                    post_id=post.id,
+                    created_at=post.created_at,
+                )
+            )
+            if len(items) >= limit:
+                return items
+    return items
 
 
 # --------------------------------- Stats -----------------------------------

@@ -1,4 +1,12 @@
-from fastapi import APIRouter, Depends
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Query,
+    UploadFile,
+    status,
+)
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
@@ -11,13 +19,19 @@ from app.schemas.user import (
     BookmarkListResponse,
     FollowersResponse,
     FollowingResponse,
+    LikedPostsResponse,
+    MediaListResponse,
+    OkResponse,
     ProfileResponse,
     StatsResponse,
+    UploadOut,
     UserMe,
     UsernameLookupResponse,
 )
 from app.services import auth_service
+from app.services import media_service as media_svc
 from app.services import user_service as svc
+from app.utils.rate_limit import check_rate_limit
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -38,6 +52,41 @@ def patch_my_profile(
 ):
     """Plantilla de endpoint de escritura: valida con Pydantic → muta → devuelve."""
     return auth_service.update_profile(db, user, payload)
+
+
+@router.post("/me/media", response_model=UploadOut, status_code=status.HTTP_201_CREATED)
+def upload_media(
+    file: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+):
+    """Sube una imagen o un video (avatar, portada o galería).
+
+    Valida el tipo MIME, la extensión y el tamaño. Devuelve la URL pública
+    del archivo, listo para guardarlo en el perfil o en una publicación.
+    """
+    check_rate_limit(f"media:upload:{user.id}", limit=20, window_seconds=60)
+    try:
+        uploaded = media_svc.save_upload(file, user.id)
+    except media_svc.UploadError as exc:
+        raise media_svc.http_error(exc) from None
+    return UploadOut(
+        url=uploaded.url,
+        kind=uploaded.kind,
+        filename=uploaded.filename,
+        size=uploaded.size,
+    )
+
+
+@router.delete("/me/media", response_model=OkResponse)
+def delete_media(
+    url: str = Query(..., min_length=1, description="URL del archivo a borrar"),
+    user: User = Depends(get_current_user),
+):
+    """Borra un archivo subido previamente por su URL."""
+    deleted = media_svc.delete_upload(url)
+    if not deleted:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "File not found")
+    return OkResponse(ok=True)
 
 
 @router.get("/me/stats", response_model=StatsResponse)
@@ -91,3 +140,29 @@ def read_followers(user_id: str, db: Session = Depends(get_db)):
 def read_following(user_id: str, db: Session = Depends(get_db)):
     following = svc.list_following(db, user_id)
     return FollowingResponse(following=following, total=len(following))
+
+
+@router.get("/{user_id}/likes", response_model=LikedPostsResponse)
+def read_liked_posts(
+    user_id: str,
+    limit: int = Query(50, ge=1, le=100),
+    viewer: User | None = Depends(get_optional_user),
+    db: Session = Depends(get_db),
+):
+    """Pestaña 'Me gusta': publicaciones que el usuario marcó como me gusta."""
+    viewer_id = viewer.id if viewer else None
+    items = svc.list_liked_posts(db, user_id, viewer_id, limit=limit)
+    return LikedPostsResponse(items=items)
+
+
+@router.get("/{user_id}/media", response_model=MediaListResponse)
+def read_user_media(
+    user_id: str,
+    limit: int = Query(60, ge=1, le=200),
+    viewer: User | None = Depends(get_optional_user),
+    db: Session = Depends(get_db),
+):
+    """Pestaña 'Multimedia': galería de imágenes y videos del usuario."""
+    viewer_id = viewer.id if viewer else None
+    items = svc.list_user_media(db, user_id, viewer_id, limit=limit)
+    return MediaListResponse(items=items)

@@ -26,3 +26,6 @@ devplay-web/out/
 devplay-web/*.tsbuildinfo
 devplay-web/.env.local
 devplay-web/.vercel/
+
+# Archivos subidos por los usuarios (avatar, portada, galeria)
+uploads/
