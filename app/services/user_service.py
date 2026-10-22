@@ -476,3 +476,26 @@ def my_bookmarks(db, user_id: str, viewer_id: str) -> list[PostSummary]:
     for item in serialized:
         item.saved_at = saved_at_by_post.get(item.id)
     return serialized
+
+
+# --------------------------------- Me gusta --------------------------------
+
+
+def my_likes(db, user_id: str, viewer_id: str | None) -> list[PostSummary]:
+    """Posts que el usuario marcó como "me gusta" (pestaña del perfil)."""
+    posts = db.scalars(
+        select(Post)
+        .join(Like, Like.post_id == Post.id)
+        .where(Like.user_id == user_id)
+        .options(
+            selectinload(Post.author),
+            selectinload(Post.beta),
+            selectinload(Post.stream),
+            selectinload(Post.repost_of).selectinload(Post.author),
+            selectinload(Post.repost_of).selectinload(Post.beta),
+            selectinload(Post.repost_of).selectinload(Post.stream),
+        )
+        .order_by(Like.created_at.desc())
+        .limit(50)
+    ).all()
+    return serialize_posts(db, posts, viewer_id)

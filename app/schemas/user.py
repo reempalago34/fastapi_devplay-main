@@ -312,3 +312,40 @@ class AchievementsResponse(BaseModel):
 
 class BookmarkListResponse(BaseModel):
     posts: list[PostSummary]
+
+
+# ------------------------- Medios del usuario ---------------------------
+# El cliente Flutter sube el avatar/portada con POST /users/me/media
+# (multipart) y lista su galería con GET /users/{id}/media.
+
+
+class MediaUploadOut(BaseModel):
+    """Respuesta de `POST /users/me/media` (archivo ya guardado)."""
+
+    url: str
+    kind: str = "image"  # image | video
+    filename: str = ""
+    size: int = 0
+
+
+class ProfileMediaOut(BaseModel):
+    """Un medio del usuario en `GET /users/{id}/media`."""
+
+    url: str
+    kind: str = "image"
+    post_id: str | None = Field(default=None, alias="postId")
+    created_at: datetime = Field(alias="createdAt")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class MediaListResponse(BaseModel):
+    items: list[ProfileMediaOut]
+    total: int
+
+
+class LikedPostsResponse(BaseModel):
+    """Publicaciones que el usuario marcó como "me gusta"."""
+
+    items: list[PostSummary]
+    total: int
