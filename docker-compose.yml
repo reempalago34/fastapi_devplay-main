@@ -25,7 +25,11 @@ services:
       JWT_SECRET: ${JWT_SECRET:-dev-secret-cambiar}
       APP_ENV: ${APP_ENV:-dev}
       CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:3000"]}
+      CORS_ORIGIN_REGEX: ${CORS_ORIGIN_REGEX:-http://(localhost|127\.0\.0\.1)(:\d+)?}
       REALTIME_SECRET: ${REALTIME_SECRET:-}
+      MEDIA_DIR: /app/media
+    volumes:
+      - media:/app/media
     expose:
       - "8000"
     healthcheck:
@@ -40,3 +44,4 @@ services:
 
 volumes:
   pgdata:
+  media:
