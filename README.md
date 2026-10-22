@@ -26,7 +26,7 @@ pip install -e ".[dev]"
 cp .env.example .env          # revisar DATABASE_URL y JWT_SECRET
 
 ./scripts/dev-db.sh start     # Postgres propio en :55432 + crea las 2 bases
-alembic upgrade head          # crea las 22 tablas
+alembic upgrade head          # crea las 23 tablas
 uvicorn app.main:app --reload
 ```
 
@@ -49,6 +49,28 @@ docker compose up --build     # api en :8000, postgres en :5433
 | GET | `/api/v1/auth/me` | Bearer | Usuario actual |
 | GET | `/api/v1/users/me` | Bearer | Perfil completo |
 | PATCH | `/api/v1/users/me/profile` | Bearer | Actualiza perfil |
+
+## Compatibilidad con el cliente Flutter
+
+La app móvil/web (`frankalexander-GM/flutter-dev`) consume esta API. Estos
+endpoints y campos existen para que el cliente funcione sin cambios; el
+contrato está fijado en `tests/test_flutter_contract.py`.
+
+| Método | Ruta | Qué aporta |
+|---|---|---|
+| POST | `/api/v1/users/me/media` | Sube un archivo (multipart, campo `file`) → `{url, kind, filename, size}` |
+| DELETE | `/api/v1/users/me/media?url=` | Borra un archivo subido |
+| GET | `/api/v1/users/{id}/media` | Galería del usuario → `{items: [{url, kind, postId, createdAt}]}` |
+| GET | `/api/v1/users/{id}/likes` | Pestaña "me gusta" → `{items: [PostSummary]}` |
+| GET | `/api/v1/posts?type=&sort=` | `type` filtra (POST/BETA/POLL...), `sort=latest\|trending` |
+| GET | `/api/v1/store/items` | Añade `categories` (`{id, name, icon, items}`) junto a `items` y `grouped` |
+| GET | `/api/v1/store/balance` | Añade `dev_coins` y `recent_transactions` |
+| POST | `/api/v1/store/buy` | Añade `new_balance`, `item` y `message` |
+| GET | `/api/v1/store/my-items` | Cada compra incluye la ficha aplanada (`name`, `price`, `category`...) |
+
+Los archivos subidos se guardan en `MEDIA_DIR` y se sirven en `/media`.
+`CORS_ORIGIN_REGEX` acepta cualquier puerto de `localhost`/`127.0.0.1` porque
+Flutter web corre en un puerto aleatorio.
 
 ## Tests
 
