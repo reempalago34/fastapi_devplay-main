@@ -17,6 +17,12 @@ class PostType(StrEnum):
     BETA = "BETA"
     STREAM = "STREAM"
     POLL = "POLL"
+    # Tipos que solo usa el cliente Flutter (los acepta el API para que el
+    # frontend pueda crear posts de ese tipo sin recibir un 422).
+    GAME_SHOWCASE = "GAME_SHOWCASE"
+    DEV_LOG = "DEV_LOG"
+    UPDATE = "UPDATE"
+    ANNOUNCEMENT = "ANNOUNCEMENT"
 
 
 class BetaStatus(StrEnum):
@@ -60,6 +66,14 @@ class ReportReason(StrEnum):
     INAPPROPRIATE = "inappropriate"
     IMPERSONATION = "impersonation"
     OTHER = "other"
+    # Motivos que usa el cliente Flutter (no estaban en el API original).
+    HATE_SPEECH = "hate_speech"
+    MISINFORMATION = "misinformation"
+    NSFW = "nsfw"
+    COPYRIGHT = "copyright"
+    MALWARE = "malware"
+    FAKE_ACCOUNT = "fake_account"
+    OFF_TOPIC = "off_topic"
 
 
 class ReportStatus(StrEnum):
