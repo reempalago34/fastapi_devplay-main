@@ -3,6 +3,10 @@
 Los tests NUNCA tocan la BD de desarrollo: derivan el nombre de la base
 (`X` → `X_test`) a partir del DATABASE_URL real, así funcionan igual en local,
 en Docker o en el Postgres del compañero.
+
+Si el entorno define `TEST_DATABASE_URL` se usa esa URL tal cual (útil cuando
+la máquina no puede crear bases, por ejemplo en CI con un usuario sin
+CREATEDB o cuando la BD vive en otro servidor).
 """
 
 import os
@@ -12,9 +16,9 @@ from sqlalchemy.engine import make_url
 from app.core.config import get_settings
 
 _dev_url = make_url(get_settings().database_url)
-os.environ["DATABASE_URL"] = _dev_url.set(database=f"{_dev_url.database}_test").render_as_string(
-    hide_password=False
-)
+os.environ["DATABASE_URL"] = os.environ.get("TEST_DATABASE_URL") or _dev_url.set(
+    database=f"{_dev_url.database}_test"
+).render_as_string(hide_password=False)
 get_settings.cache_clear()
 
 import pytest  # noqa: E402

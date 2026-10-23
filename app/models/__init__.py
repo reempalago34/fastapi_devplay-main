@@ -6,6 +6,7 @@ from app.models.base import Base
 from app.models.beta import Beta
 from app.models.chat import ChatMessage, DirectMessage, Notification
 from app.models.content import Bookmark, Comment, Like, Post
+from app.models.media import UserMedia
 from app.models.poll import Poll, PollOption, PollVote
 from app.models.social import Block, Follow, Report
 from app.models.store import DevCoinTransaction, StoreItem, StorePurchase
@@ -36,4 +37,5 @@ __all__ = [
     "StoreItem",
     "StorePurchase",
     "DevCoinTransaction",
+    "UserMedia",
 ]

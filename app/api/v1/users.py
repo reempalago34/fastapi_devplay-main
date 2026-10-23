@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Request, UploadFile, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
@@ -6,18 +6,24 @@ from app.core.database import get_db
 from app.core.deps import get_current_user, get_optional_user
 from app.models.user import User
 from app.schemas.auth import ProfileUpdateRequest
+from app.schemas.security import OkResponse
 from app.schemas.user import (
     AchievementsResponse,
     BookmarkListResponse,
     FollowersResponse,
     FollowingResponse,
+    LikedPostsResponse,
+    MediaListResponse,
+    MediaUploadOut,
     ProfileResponse,
     StatsResponse,
     UserMe,
     UsernameLookupResponse,
 )
 from app.services import auth_service
+from app.services import media_service as media_svc
 from app.services import user_service as svc
+from app.utils.rate_limit import check_rate_limit
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -58,6 +64,36 @@ def my_bookmarks(user: User = Depends(get_current_user), db: Session = Depends(g
     return BookmarkListResponse(posts=svc.my_bookmarks(db, user.id, user.id))
 
 
+# --- Medios del usuario (subida de avatar, portada y galería) ---
+
+
+@router.post("/me/media", response_model=MediaUploadOut)
+def upload_media(
+    request: Request,
+    file: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Sube un archivo (avatar, portada, imagen de galería).
+
+    multipart/form-data con el campo `file`. Responde {url, kind, filename, size}.
+    """
+    check_rate_limit(f"media:upload:{user.id}", limit=20, window_seconds=60)
+    return media_svc.save_upload(db, user, request, file)
+
+
+@router.delete("/me/media", response_model=OkResponse)
+def delete_media(
+    url: str = Query(..., min_length=1),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Borra un archivo subido por el usuario (por su URL)."""
+    if not media_svc.delete_upload(db, user, url):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Archivo no encontrado")
+    return OkResponse()
+
+
 # --- Usuarios ---
 
 
@@ -91,3 +127,21 @@ def read_followers(user_id: str, db: Session = Depends(get_db)):
 def read_following(user_id: str, db: Session = Depends(get_db)):
     following = svc.list_following(db, user_id)
     return FollowingResponse(following=following, total=len(following))
+
+
+@router.get("/{user_id}/media", response_model=MediaListResponse)
+def read_media(user_id: str, db: Session = Depends(get_db)):
+    """Galería de medios del usuario (imágenes y videos subidos)."""
+    items = media_svc.list_media(db, user_id)
+    return MediaListResponse(items=items, total=len(items))
+
+
+@router.get("/{user_id}/likes", response_model=LikedPostsResponse)
+def read_likes(
+    user_id: str,
+    viewer: User | None = Depends(get_optional_user),
+    db: Session = Depends(get_db),
+):
+    """Publicaciones que el usuario marcó como "me gusta"."""
+    posts = svc.my_likes(db, user_id, viewer.id if viewer else None)
+    return LikedPostsResponse(items=posts, total=len(posts))
