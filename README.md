@@ -72,6 +72,23 @@ Los archivos subidos se guardan en `MEDIA_DIR` y se sirven en `/media`.
 `CORS_ORIGIN_REGEX` acepta cualquier puerto de `localhost`/`127.0.0.1` porque
 Flutter web corre en un puerto aleatorio.
 
+### Flutter Android en desarrollo local
+
+El cliente Flutter usa `http://localhost:8000/api/v1`. En Android, `localhost`
+es el dispositivo, así que crea un túnel ADB antes de iniciar el backend:
+
+```bash
+# Con el entorno virtual del backend activo y un dispositivo autorizado por adb:
+bash scripts/run-flutter-android.sh
+```
+
+El script configura `adb reverse tcp:8000 tcp:8000` y levanta la API en el
+puerto local 8000. La app Flutter debe ejecutarse en modo debug y tener el
+dispositivo conectado mientras se use el túnel. Para producción, publica la
+API detrás de HTTPS y configura el cliente Android con permiso de Internet en
+su manifiesto de release; ese permiso pertenece a la app y no puede añadirse
+desde el backend.
+
 ## Tests
 
 ```bash
