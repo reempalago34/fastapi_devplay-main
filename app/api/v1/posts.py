@@ -1,8 +1,11 @@
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.deps import get_current_user, get_optional_user
+from app.core.enums import PostType
 from app.models.content import Bookmark, Comment, Like, Post
 from app.models.user import User
 from app.schemas.content import (
@@ -94,12 +97,33 @@ def list_posts(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     author_id: str | None = Query(None, description="Filtra por autor"),
+    post_type: PostType | None = Query(
+        None,
+        alias="type",
+        description="Filtra por tipo de post (POST, BETA, POLL, STREAM...)",
+    ),
+    sort: Literal["latest", "trending"] = Query(
+        "latest", description="Orden del feed: latest (recientes) o trending (más Likes)"
+    ),
+    live: bool = Query(False, description="Solo posts de un directo en vivo"),
     db: Session = Depends(get_db),
     viewer: User | None = Depends(get_optional_user),
 ):
-    """Feed paginado del más nuevo al más viejo. Los reposts no aparecen aquí."""
+    """Feed paginado del más nuevo al más viejo. Los reposts no aparecen aquí.
+
+    Admite `type` (filtro por tipo de publicación), `sort=trending`
+    (los posts con más likes y comentarios primero) y `live=true`
+    (solo los posts de un directo que esté en vivo).
+    """
     posts, total = svc.list_posts(
-        db, skip=skip, limit=limit, author_id=author_id, viewer_id=viewer.id if viewer else None
+        db,
+        skip=skip,
+        limit=limit,
+        author_id=author_id,
+        viewer_id=viewer.id if viewer else None,
+        post_type=str(post_type) if post_type else None,
+        sort=sort,
+        live_only=live,
     )
     return PostListOut(
         items=_serialize_many(db, posts, viewer.id if viewer else None),

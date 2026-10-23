@@ -138,6 +138,47 @@ def test_get_feed_filter_by_author(client, author, reader):
     assert body["items"][0]["content"] == "de reader"
 
 
+def test_get_feed_filter_by_type(client, author):
+    """`type` filtra el feed por tipo de publicación (lo usa Flutter y Next.js)."""
+    make_post(client, author, "un post")
+    beta = client.post(
+        f"{BASE}/betas",
+        json={"title": "Beta del feed", "description": "para el filtro"},
+        headers=author,
+    )
+    assert beta.status_code == 201, beta.text
+
+    body = client.get(f"{BASE}/posts", params={"type": "BETA"}).json()
+    assert body["total"] == 1
+    assert body["items"][0]["type"] == "BETA"
+
+    # sin filtro vienen los dos
+    assert client.get(f"{BASE}/posts").json()["total"] == 2
+
+    # un tipo desconocido es un 422 (no se ignora en silencio)
+    assert client.get(f"{BASE}/posts", params={"type": "INVENTADO"}).status_code == 422
+
+
+def test_get_feed_sort_trending(client, author):
+    """`sort=trending` pone delante los posts con más likes."""
+    caliente = make_post(client, author, "caliente")
+    frio = make_post(client, author, "frio")
+    client.post(f"{BASE}/posts/{caliente['id']}/likes", headers=author)
+
+    ids = [
+        p["id"]
+        for p in client.get(f"{BASE}/posts", params={"sort": "trending"}).json()["items"]
+    ]
+    assert ids.index(caliente["id"]) < ids.index(frio["id"])
+
+    # `latest` sigue siendo por fecha (el más nuevo primero)
+    ids = [p["id"] for p in client.get(f"{BASE}/posts", params={"sort": "latest"}).json()["items"]]
+    assert ids.index(frio["id"]) < ids.index(caliente["id"])
+
+    # un sort desconocido es un 422
+    assert client.get(f"{BASE}/posts", params={"sort": "inventado"}).status_code == 422
+
+
 def test_get_post_by_id(client, author):
     post = make_post(client, author)
     res = client.get(f"{BASE}/posts/{post['id']}")
