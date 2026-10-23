@@ -2,6 +2,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from app.models.content import Bookmark, Comment, Like, Post
+from app.models.stream import Stream
 from app.models.user import User
 from app.schemas.content import CommentCreate, PostCreate, PostUpdate
 from app.utils.json_fields import dumps_json
@@ -35,11 +36,18 @@ def list_posts(
     limit: int = 20,
     author_id: str | None = None,
     viewer_id: str | None = None,
+    post_type: str | None = None,
+    sort: str = "latest",
+    live_only: bool = False,
 ) -> tuple[list[Post], int]:
     """Feed paginado, del más nuevo al más viejo.
 
     Los reposts se excluyen del feed general, pero SÍ aparecen en el perfil de
     quien los hizo (filtrando por `author_id`), igual que en devplay-main.
+
+    `post_type` filtra por tipo (POST, BETA, POLL...) y `sort` admite
+    "latest" (por defecto) y "trending" (más likes + comentarios primero).
+    `live_only` deja solo los posts de un directo que esté en vivo.
     """
     stmt = select(Post)
     count_stmt = select(func.count()).select_from(Post)
@@ -51,8 +59,35 @@ def list_posts(
         stmt = stmt.where(Post.repost_of_id.is_(None))
         count_stmt = count_stmt.where(Post.repost_of_id.is_(None))
 
+    if live_only:
+        stmt = stmt.join(Stream, Stream.post_id == Post.id).where(Stream.is_live.is_(True))
+        count_stmt = count_stmt.join(Stream, Stream.post_id == Post.id).where(
+            Stream.is_live.is_(True)
+        )
+    elif post_type:
+        stmt = stmt.where(Post.type == post_type)
+        count_stmt = count_stmt.where(Post.type == post_type)
+
     total = db.scalar(count_stmt) or 0
-    stmt = stmt.order_by(Post.created_at.desc()).offset(skip).limit(limit)
+
+    if sort == "trending":
+        likes = (
+            select(func.count())
+            .select_from(Like)
+            .where(Like.post_id == Post.id)
+            .scalar_subquery()
+        )
+        comments = (
+            select(func.count())
+            .select_from(Comment)
+            .where(Comment.post_id == Post.id)
+            .scalar_subquery()
+        )
+        stmt = stmt.order_by((likes + comments).desc(), Post.created_at.desc())
+    else:
+        stmt = stmt.order_by(Post.created_at.desc())
+
+    stmt = stmt.offset(skip).limit(limit)
     return list(db.scalars(stmt).all()), total
 
 

@@ -357,6 +357,22 @@ def test_stream_can_attach_to_post(client, author):
     assert stream["postId"] == post_id
 
 
+def test_feed_live_filter(client, author):
+    """`live=true` deja solo los posts de un directo que esté en vivo."""
+    post_id = client.post(
+        f"{BASE}/posts", json={"content": "post del directo"}, headers=author
+    ).json()["id"]
+    otro = client.post(
+        f"{BASE}/posts", json={"content": "post normal"}, headers=author
+    ).json()["id"]
+    make_live(client, author, post_id=post_id)
+
+    body = client.get(f"{BASE}/posts", params={"live": True}).json()
+    ids = [p["id"] for p in body["items"]]
+    assert post_id in ids
+    assert otro not in ids
+
+
 # ---------------------------------------------------------------- Integración
 
 
