@@ -80,14 +80,20 @@ es el dispositivo, así que crea un túnel ADB antes de iniciar el backend:
 ```bash
 # Con el entorno virtual del backend activo y un dispositivo autorizado por adb:
 bash scripts/run-flutter-android.sh
+
+# Si hay más de un dispositivo, elige el serial mostrado por `adb devices`:
+ANDROID_SERIAL=emulator-5554 bash scripts/run-flutter-android.sh
 ```
 
-El script configura `adb reverse tcp:8000 tcp:8000` y levanta la API en el
-puerto local 8000. La app Flutter debe ejecutarse en modo debug y tener el
-dispositivo conectado mientras se use el túnel. Para producción, publica la
-API detrás de HTTPS y configura el cliente Android con permiso de Internet en
-su manifiesto de release; ese permiso pertenece a la app y no puede añadirse
-desde el backend.
+El script comprueba que haya un único dispositivo (o usa `ANDROID_SERIAL`),
+configura `adb reverse tcp:8000 tcp:8000` y levanta la API en el puerto local
+8000. Al detener el servidor con Ctrl+C, elimina la redirección. La app Flutter
+debe ejecutarse en modo debug y el dispositivo debe seguir conectado mientras
+se use el túnel. Se puede cambiar el puerto con `DEVPLAY_API_PORT`.
+
+Para producción, publica la API detrás de HTTPS. La compilación release de
+Flutter también debe incluir permiso de Internet en su manifiesto; FastAPI no
+puede agregar permisos a la app desde el servidor.
 
 ## Tests
 
