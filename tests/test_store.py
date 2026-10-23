@@ -74,13 +74,23 @@ def test_items_grouped_is_consistent(client, db):
 
 def test_balance(client, db):
     # anónimo → 0 y lista vacía
-    assert client.get(f"{BASE}/store/balance").json() == {"balance": 0, "transactions": []}
+    assert client.get(f"{BASE}/store/balance").json() == {
+        "balance": 0,
+        "dev_coins": 0,
+        "transactions": [],
+        "recent_transactions": [],
+    }
 
     alice = make_user(db, "store_bal@t.com", "store_bal")  # devCoins inicial = 100
     headers = auth(alice)
 
     body = client.get(f"{BASE}/store/balance", headers=headers).json()
-    assert body == {"balance": 100, "transactions": []}
+    assert body == {
+        "balance": 100,
+        "dev_coins": 100,
+        "transactions": [],
+        "recent_transactions": [],
+    }
 
     db.add(
         DevCoinTransaction(
@@ -91,11 +101,17 @@ def test_balance(client, db):
 
     body = client.get(f"{BASE}/store/balance", headers=headers).json()
     assert body["balance"] == 100
+    assert body["dev_coins"] == 100
     assert len(body["transactions"]) == 1
     tx = body["transactions"][0]
     assert tx["amount"] == -25
     assert tx["userId"] == alice.id
     assert tx["createdAt"]
+    assert tx["created_at"]
+
+    # alias que usa el cliente Flutter: mismos movimientos en snake_case
+    assert body["recent_transactions"][0]["created_at"]
+    assert body["recent_transactions"][0]["amount"] == -25
 
     # máximo 20 transacciones, más recientes primero
     for i in range(25):

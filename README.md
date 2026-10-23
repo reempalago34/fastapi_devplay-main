@@ -26,7 +26,7 @@ pip install -e ".[dev]"
 cp .env.example .env          # revisar DATABASE_URL y JWT_SECRET
 
 ./scripts/dev-db.sh start     # Postgres propio en :55432 + crea las 2 bases
-alembic upgrade head          # crea las 22 tablas
+alembic upgrade head          # crea las 23 tablas
 uvicorn app.main:app --reload
 ```
 
@@ -49,6 +49,51 @@ docker compose up --build     # api en :8000, postgres en :5433
 | GET | `/api/v1/auth/me` | Bearer | Usuario actual |
 | GET | `/api/v1/users/me` | Bearer | Perfil completo |
 | PATCH | `/api/v1/users/me/profile` | Bearer | Actualiza perfil |
+
+## Compatibilidad con el cliente Flutter
+
+La app móvil/web (`frankalexander-GM/flutter-dev`) consume esta API. Estos
+endpoints y campos existen para que el cliente funcione sin cambios; el
+contrato está fijado en `tests/test_flutter_contract.py`.
+
+| Método | Ruta | Qué aporta |
+|---|---|---|
+| POST | `/api/v1/users/me/media` | Sube un archivo (multipart, campo `file`) → `{url, kind, filename, size}` |
+| DELETE | `/api/v1/users/me/media?url=` | Borra un archivo subido |
+| GET | `/api/v1/users/{id}/media` | Galería del usuario → `{items: [{url, kind, postId, createdAt}]}` |
+| GET | `/api/v1/users/{id}/likes` | Pestaña "me gusta" → `{items: [PostSummary]}` |
+| GET | `/api/v1/posts?type=&sort=` | `type` filtra (POST/BETA/POLL...), `sort=latest\|trending` |
+| GET | `/api/v1/store/items` | Añade `categories` (`{id, name, icon, items}`) junto a `items` y `grouped` |
+| GET | `/api/v1/store/balance` | Añade `dev_coins` y `recent_transactions` |
+| POST | `/api/v1/store/buy` | Añade `new_balance`, `item` y `message` |
+| GET | `/api/v1/store/my-items` | Cada compra incluye la ficha aplanada (`name`, `price`, `category`...) |
+
+Los archivos subidos se guardan en `MEDIA_DIR` y se sirven en `/media`.
+`CORS_ORIGIN_REGEX` acepta cualquier puerto de `localhost`/`127.0.0.1` porque
+Flutter web corre en un puerto aleatorio.
+
+### Flutter Android en desarrollo local
+
+El cliente Flutter usa `http://localhost:8000/api/v1`. En Android, `localhost`
+es el dispositivo, así que crea un túnel ADB antes de iniciar el backend:
+
+```bash
+# Con el entorno virtual del backend activo y un dispositivo autorizado por adb:
+bash scripts/run-flutter-android.sh
+
+# Si hay más de un dispositivo, elige el serial mostrado por `adb devices`:
+ANDROID_SERIAL=emulator-5554 bash scripts/run-flutter-android.sh
+```
+
+El script comprueba que haya un único dispositivo (o usa `ANDROID_SERIAL`),
+configura `adb reverse tcp:8000 tcp:8000` y levanta la API en el puerto local
+8000. Al detener el servidor con Ctrl+C, elimina la redirección. La app Flutter
+debe ejecutarse en modo debug y el dispositivo debe seguir conectado mientras
+se use el túnel. Se puede cambiar el puerto con `DEVPLAY_API_PORT`.
+
+Para producción, publica la API detrás de HTTPS. La compilación release de
+Flutter también debe incluir permiso de Internet en su manifiesto; FastAPI no
+puede agregar permisos a la app desde el servidor.
 
 ## Tests
 

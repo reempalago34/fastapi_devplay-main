@@ -17,9 +17,16 @@ router = APIRouter(prefix="/store", tags=["store"])
 
 
 @router.get("/items", response_model=ItemsResponse)
-def list_items(db: Session = Depends(get_db)):
-    """Catálogo completo agrupado por categoría (lectura anónima)."""
-    return svc.list_items(db)
+def list_items(
+    user: User | None = Depends(get_optional_user),
+    db: Session = Depends(get_db),
+):
+    """Catálogo completo agrupado por categoría (lectura anónima).
+
+    Devuelve `items` (lista plana), `grouped` (por clave de categoría) y
+    `categories` (con nombre e icono: las usa el cliente Flutter como pestañas).
+    """
+    return svc.list_items(db, user.id if user else None)
 
 
 @router.get("/balance", response_model=BalanceResponse)

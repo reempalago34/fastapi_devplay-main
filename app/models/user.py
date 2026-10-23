@@ -57,6 +57,7 @@ class User(Base, TimestampMixin):
     likes = relationship("Like", back_populates="user", lazy="select")
     bookmarks = relationship("Bookmark", back_populates="user", lazy="select")
     streams = relationship("Stream", back_populates="user", lazy="select")
+    media = relationship("UserMedia", back_populates="user", lazy="select")
 
     following = relationship(
         "Follow",
