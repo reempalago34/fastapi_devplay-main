@@ -24,7 +24,11 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
 
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:81"]
+    cors_origins: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:81",
+        "https://app.proyecto.sbs",
+    ]
     # El cliente Flutter web corre en un puerto aleatorio (`flutter run -d chrome`),
     # así que además de la lista fija se acepta cualquier origen localhost/127.0.0.1.
     cors_origin_regex: str = r"http://(localhost|127\.0\.0\.1)(:\d+)?"
