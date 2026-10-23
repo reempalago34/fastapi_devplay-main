@@ -10,28 +10,92 @@ from sqlalchemy.orm import selectinload
 
 from app.models.store import DevCoinTransaction, StoreItem, StorePurchase
 from app.models.user import User
-from app.schemas.store import PurchaseOut, StoreItemOut
+from app.schemas.store import PurchaseOut, StoreCategoryOut, StoreItemOut
 from app.utils.rate_limit import check_rate_limit
 
 # Categorías fijas del original (siempre presentes en `grouped`, aunque vacías)
 BASE_CATEGORIES = ("powerup", "avatar", "premium", "bundle")
 
+# Nombre e icono de cada categoría (el cliente Flutter los usa como pestañas)
+CATEGORY_META = {
+    "powerup": ("Power-ups", "flash_on"),
+    "avatar": ("Avatar", "image"),
+    "premium": ("Premium", "workspace_premium"),
+    "bundle": ("Bundle", "campaign"),
+}
 
-def list_items(db) -> dict:
+
+def _item_out(item: StoreItem, is_owned: bool = False) -> StoreItemOut:
+    out = StoreItemOut.model_validate(item)
+    out.is_owned = is_owned
+    return out
+
+
+def _purchase_out(purchase: StorePurchase, item: StoreItem) -> PurchaseOut:
+    """Compra con la ficha anidada y también con sus campos aplanados."""
+    item_out = _item_out(item)
+    return PurchaseOut(
+        id=purchase.id,
+        user_id=purchase.user_id,
+        item_id=purchase.item_id,
+        price_paid=purchase.price_paid,
+        created_at=purchase.created_at,
+        item=item_out,
+        name=item_out.name,
+        description=item_out.description,
+        price=item_out.price,
+        category=item_out.category,
+        icon=item_out.icon,
+        rarity=item_out.rarity,
+        is_owned=True,
+    )
+
+
+def list_items(db, user_id: str | None = None) -> dict:
     items = db.scalars(
         select(StoreItem).order_by(StoreItem.category, StoreItem.price)
     ).all()
+
+    owned: set[str] = set()
+    if user_id is not None:
+        owned = set(
+            db.scalars(
+                select(StorePurchase.item_id).where(StorePurchase.user_id == user_id)
+            )
+        )
 
     grouped: dict[str, list[StoreItem]] = {key: [] for key in BASE_CATEGORIES}
     for item in items:
         grouped.setdefault(item.category, []).append(item)
 
-    return {"items": items, "grouped": grouped}
+    categories = [
+        StoreCategoryOut(
+            id=key,
+            name=CATEGORY_META.get(key, (key.capitalize(), "shopping_bag"))[0],
+            icon=CATEGORY_META.get(key, (key.capitalize(), "shopping_bag"))[1],
+            items=[
+                _item_out(item, is_owned=item.id in owned)
+                for item in grouped.get(key, [])
+            ],
+        )
+        for key in BASE_CATEGORIES
+    ]
+
+    return {
+        "items": [_item_out(item, is_owned=item.id in owned) for item in items],
+        "grouped": grouped,
+        "categories": categories,
+    }
 
 
 def get_balance(db, user_id: str | None) -> dict:
     if user_id is None:
-        return {"balance": 0, "transactions": []}
+        return {
+            "balance": 0,
+            "dev_coins": 0,
+            "transactions": [],
+            "recent_transactions": [],
+        }
 
     balance = db.scalar(select(User.dev_coins).where(User.id == user_id)) or 0
     transactions = db.scalars(
@@ -40,7 +104,12 @@ def get_balance(db, user_id: str | None) -> dict:
         .order_by(DevCoinTransaction.created_at.desc())
         .limit(20)
     ).all()
-    return {"balance": balance, "transactions": transactions}
+    return {
+        "balance": balance,
+        "dev_coins": balance,
+        "transactions": transactions,
+        "recent_transactions": transactions,
+    }
 
 
 def buy_item(db, user_id: str, item_id: str) -> dict:
@@ -107,18 +176,15 @@ def buy_item(db, user_id: str, item_id: str) -> dict:
     db.commit()
 
     balance = db.scalar(select(User.dev_coins).where(User.id == user_id)) or 0
+    item_out = _item_out(item)
     return {
         "success": True,
-        "purchase": PurchaseOut(
-            id=purchase.id,
-            user_id=purchase.user_id,
-            item_id=purchase.item_id,
-            price_paid=purchase.price_paid,
-            created_at=purchase.created_at,
-            item=StoreItemOut.model_validate(item),
-        ),
+        "purchase": _purchase_out(purchase, item),
         "transaction": transaction,
         "balance": balance,
+        "new_balance": balance,
+        "item": item_out,
+        "message": f"Compra realizada: {item.name}",
     }
 
 
@@ -129,14 +195,4 @@ def my_items(db, user_id: str) -> list[PurchaseOut]:
         .options(selectinload(StorePurchase.item))
         .order_by(StorePurchase.created_at.desc())
     ).all()
-    return [
-        PurchaseOut(
-            id=p.id,
-            user_id=p.user_id,
-            item_id=p.item_id,
-            price_paid=p.price_paid,
-            created_at=p.created_at,
-            item=StoreItemOut.model_validate(p.item),
-        )
-        for p in purchases
-    ]
+    return [_purchase_out(p, p.item) for p in purchases]
